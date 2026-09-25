@@ -132,4 +132,5 @@ const REAL_SCENES = Object.freeze([
       {label:'Return to local organising',detail:'Focus on direct contact with supporters.',effect:{volunteers:18,support:1,energy:-6}}
     ]
   }
-].map(scene=>Object.freeze({...scene,archive:true,choices:undefined})).sort((a,b)=>a.date.localeCompare(b.date)));
+].map(scene=>Object.freeze({...scene,archive:scene.date<"2026-05-14",choices:scene.date<"2026-05-14"?undefined:(scene.choices??[{label:"Verify and brief",detail:"Document the situation before speaking.",effect:{credibility:2,energy:-5}},{label:"Organise locally",detail:"Mobilise volunteers while preserving the reported facts.",effect:{volunteers:5,energy:-7}},{label:"Observe and protect your time",detail:"Study the report while maintaining your job.",effect:{energy:3}}])})).sort((a,b)=>a.date.localeCompare(b.date)));
+
