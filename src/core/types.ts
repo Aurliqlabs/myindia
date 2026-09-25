@@ -7,6 +7,7 @@ export type TraitId = "speaker"|"analyst"|"organiser"|"legal_mind"|"outsider"|"c
 
 export interface PlayerProfile {
   id: Id; name: string; age: number; homeState: string; profession: string; trait: TraitId;
+  gender?:string; homeDistrict?:string; education?:string; familyBackground?:string; monthlyIncome:number; monthlyLivingCosts:number; jobStanding:number;
   skills: Record<SkillKey,number>; energy:number; health:number; stress:number; sleepDebt:number;
   recognition:number; level:number; personalCash:number; declaredAssets:number; hiddenAssets:number;
 }
@@ -62,7 +63,7 @@ export interface WorldState {
   secrets:Record<Id,SecretState>; publicOpinion:PublicOpinionState; macro:MacroState; parties:Record<Id,PartyState>;
   scheduledEvents:ScheduledEvent[]; completedEventIds:Id[]; flags:Record<string,boolean|number|string>;
 }
-export interface NewGameOptions { name:string; age:number; homeState:string; profession:string; trait:TraitId; seed?:number; snapshotDate?:string; }
+export interface NewGameOptions { name:string; age:number; homeState:string; profession:string; trait:TraitId; seed?:number; snapshotDate?:string; gender?:string; homeDistrict?:string; education?:string; familyBackground?:string; monthlyIncome?:number; personalSavings?:number; monthlyLivingCosts?:number; skillPoints?:Partial<Record<SkillKey,number>>; }
 export interface DailyReport {
   date:string; payroll?:{due:number;paid:number;shortfall:number}; operationUpdates:Array<{id:Id;progressDelta:number;completed:boolean}>;
   secretExposureChecks:Array<{id:Id;exposed:boolean;roll:number;threshold:number}>; triggeredEvents:ScheduledEvent[]; notes:string[];

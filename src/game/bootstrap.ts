@@ -7,6 +7,6 @@ export function createRepublic543Game(options:NewGameOptions):WorldState {
   const world=createNewGame(options);
   installHistoricalTimeline(world,movementTimeline2026);
   world.flags.content_version="2026.09.25";
-  world.flags.history_mode="documented_until_snapshot";
+  world.flags.history_mode="playable_between_documented_anchors";
   return world;
 }

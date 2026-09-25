@@ -13,7 +13,7 @@ export function advanceOneDay(world:WorldState):DailyReport {
   for(const secret of Object.values(world.secrets)){const result=tickSecretExposure(world,secret,rng);report.secretExposureChecks.push({id:secret.id,...result});if(result.exposed)report.notes.push(`Secret exposed: ${secret.kind}`);}
   const scheduled=world.scheduledEvents.filter(e=>e.date===world.date);report.triggeredEvents.push(...scheduled);world.scheduledEvents=world.scheduledEvents.filter(e=>e.date!==world.date);
   if(new Date(world.date)>=new Date(world.realWorldSnapshotDate)){const ev=generateSystemEvent(world,rng);if(ev){world.scheduledEvents.push(ev);report.notes.push(`Future event generated: ${ev.kind}`);}}
-  if(isMonthEnd(world.date))report.payroll=processMonthEnd(world);
+  if(isMonthEnd(world.date)){report.payroll=processMonthEnd(world);const p=world.player;const salary=Math.round(p.monthlyIncome*clamp(p.jobStanding,0,100)/100);p.personalCash=Math.max(0,p.personalCash+salary-p.monthlyLivingCosts);p.declaredAssets=Math.max(0,p.declaredAssets+salary-p.monthlyLivingCosts);report.notes.push(`Personal salary ${salary}; living costs ${p.monthlyLivingCosts}`);}
   world.player.energy=clamp(world.player.energy-2.2-world.player.stress*.012);world.player.stress=clamp(world.player.stress+.8+(world.player.energy<30?1.8:0));world.player.sleepDebt=clamp(world.player.sleepDebt+.5,0,100);
   if(world.player.stress>85||world.player.energy<12)world.player.health=clamp(world.player.health-.7);
   for(const c of Object.values(world.characters)){if(c.employed){c.energy=clamp(c.energy-1.2-c.stress*.006);c.stress=clamp(c.stress+.25);if(c.energy<15)c.morale=clamp(c.morale-.8);}}

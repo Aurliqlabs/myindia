@@ -1,13 +1,24 @@
 const core=require('../dist/src/core/index.js');
+const opening=require('../dist/src/game/opening.js');
+const {createRepublic543Game}=require('../dist/src/game/bootstrap.js');
 const {createRng}=require('../dist/src/core/rng.js');
 function ok(condition,message){if(!condition)throw new Error(message);}
 const w=core.createNewGame({name:'Test',age:28,homeState:'Kerala',profession:'Analyst',trait:'analyst',seed:543});
 const same=core.createNewGame({name:'Test',age:28,homeState:'Kerala',profession:'Analyst',trait:'analyst',seed:543});
 ok(JSON.stringify(w)===JSON.stringify(same),'new-game state must be deterministic');
+ok(w.date==='2026-05-14'&&w.organisation.volunteers===0,'ordinary citizen opening');
+opening.chooseFirstResponse(w,'organise');
+ok(w.flags.first_response==='organise'&&w.memories[0].date==='2026-05-14','first response must persist');
+core.advanceDays(w,2);
+for(let i=0;i<3;i++)opening.raiseSmallDonations(w,8);
+opening.prepareJantarMantar(w,'water');
+ok(opening.jantarReadiness(w).gaps.includes('security'),'preparation gaps must be visible');
 core.hireCharacter(w,'friend_rohan','Field Lead',60000);
 const op=core.startOperation(w,{kind:'protest',title:'Test Protest',location:'Delhi',targetProgress:100,budgetAllocated:10000,staffIds:['friend_rohan'],volunteerAllocation:80,mediaAttention:10,legalRisk:5,publicMomentum:10});
 core.advanceDays(w,5);ok(op.progress>0,'operations must progress');
 const secret=core.createSecret(w,{kind:'hidden_donation',severity:70,witnessIds:['friend_sameer'],evidence:[{kind:'transaction',label:'Undisclosed transfer',confidence:.9}]});ok(secret.evidenceIds.length===1,'secret must create evidence');
+const anchored=createRepublic543Game({name:'Anchor',age:25,homeState:'Delhi',profession:'Teacher',trait:'organiser'});
+ok(anchored.scheduledEvents.some(e=>e.date==='2026-06-06'&&e.payload.playable===true),'June protest must be a playable historical anchor');
 const roundTrip=core.deserializeWorld(core.serializeWorld(w));ok(roundTrip.day===w.day,'save round-trip failed');
 const parties=[{id:'a',name:'A',abbreviation:'A',nationalOrganisation:60,funds:1,leadershipStrength:50,baseSupport:40},{id:'b',name:'B',abbreviation:'B',nationalOrganisation:50,funds:1,leadershipStrength:50,baseSupport:35}];
 const result=core.simulateConstituency({id:'x',name:'X',state:'S',electorate:1000000,turnoutBase:68,partyBaseline:{a:44,b:40},volatility:5},parties,{nationalSwing:{},organisationByParty:{}},createRng(10));ok(['a','b'].includes(result.winnerPartyId),'election must produce a winner');
