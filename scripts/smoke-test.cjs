@@ -1,6 +1,7 @@
 const core=require('../dist/src/core/index.js');
 const opening=require('../dist/src/game/opening.js');
 const {createRepublic543Game}=require('../dist/src/game/bootstrap.js');
+const campaign=require('../dist/src/game/campaign-2026.js');
 const {createRng}=require('../dist/src/core/rng.js');
 function ok(condition,message){if(!condition)throw new Error(message);}
 const w=core.createNewGame({name:'Test',age:28,homeState:'Kerala',profession:'Analyst',trait:'analyst',seed:543});
@@ -19,6 +20,19 @@ core.advanceDays(w,5);ok(op.progress>0,'operations must progress');
 const secret=core.createSecret(w,{kind:'hidden_donation',severity:70,witnessIds:['friend_sameer'],evidence:[{kind:'transaction',label:'Undisclosed transfer',confidence:.9}]});ok(secret.evidenceIds.length===1,'secret must create evidence');
 const anchored=createRepublic543Game({name:'Anchor',age:25,homeState:'Delhi',profession:'Teacher',trait:'organiser'});
 ok(anchored.scheduledEvents.some(e=>e.date==='2026-06-06'&&e.payload.playable===true),'June protest must be a playable historical anchor');
+const field=createRepublic543Game({name:'Field',age:29,homeState:'Delhi',profession:'Teacher',trait:'organiser',seed:543});
+opening.chooseFirstResponse(field,'organise');core.advanceDays(field,23);core.receiveDonation(field,45000);
+for(const task of ['water','security','permissions'])opening.prepareJantarMantar(field,task);
+const treasury=field.organisation.finance.organisationCash;
+campaign.organiseProtestDay(field,'mobilise');
+ok(field.organisation.finance.organisationCash<treasury&&campaign.campaign2026(field).crowdTrust>38,'safe preparation must affect the campaign');
+let repeated=false;try{campaign.organiseProtestDay(field,'mobilise');}catch(e){repeated=true;}ok(repeated,'one field decision per day');
+const unsafe=createRepublic543Game({name:'Unsafe',age:29,homeState:'Delhi',profession:'Teacher',trait:'organiser',seed:543});
+opening.chooseFirstResponse(unsafe,'organise');core.advanceDays(unsafe,23);core.receiveDonation(unsafe,45000);
+campaign.organiseProtestDay(unsafe,'mobilise');ok(campaign.campaign2026(unsafe).crowdTrust<38&&campaign.campaign2026(unsafe).legalPressure>0,'unsafe mobilisation must cost trust');
+core.advanceDays(field,44);campaign.negotiate2026(field,{demand:'exam_reform',publicBriefing:true,pauseDemonstrations:true});
+let anchor=false;while(field.date<='2026-07-25'){const report=campaign.advanceCampaignDay(field);anchor ||=report.triggeredEvents.some(e=>e.id==='cjp_2026_07_25_minister_resignation');}
+ok(anchor&&field.flags.reported_ministerial_resignation===true,'documented outcome must fire independently of tactics');
 const roundTrip=core.deserializeWorld(core.serializeWorld(w));ok(roundTrip.day===w.day,'save round-trip failed');
 const parties=[{id:'a',name:'A',abbreviation:'A',nationalOrganisation:60,funds:1,leadershipStrength:50,baseSupport:40},{id:'b',name:'B',abbreviation:'B',nationalOrganisation:50,funds:1,leadershipStrength:50,baseSupport:35}];
 const result=core.simulateConstituency({id:'x',name:'X',state:'S',electorate:1000000,turnoutBase:68,partyBaseline:{a:44,b:40},volatility:5},parties,{nationalSwing:{},organisationByParty:{}},createRng(10));ok(['a','b'].includes(result.winnerPartyId),'election must produce a winner');

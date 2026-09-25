@@ -62,6 +62,7 @@ export interface WorldState {
   memories:CharacterMemory[]; operations:Record<Id,OperationState>; evidence:Record<Id,EvidenceNode>; evidenceEdges:EvidenceEdge[];
   secrets:Record<Id,SecretState>; publicOpinion:PublicOpinionState; macro:MacroState; parties:Record<Id,PartyState>;
   scheduledEvents:ScheduledEvent[]; completedEventIds:Id[]; flags:Record<string,boolean|number|string>;
+  campaign2026?:import("../game/campaign-2026").Campaign2026State;
 }
 export interface NewGameOptions { name:string; age:number; homeState:string; profession:string; trait:TraitId; seed?:number; snapshotDate?:string; gender?:string; homeDistrict?:string; education?:string; familyBackground?:string; monthlyIncome?:number; personalSavings?:number; monthlyLivingCosts?:number; skillPoints?:Partial<Record<SkillKey,number>>; }
 export interface DailyReport {
