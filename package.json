@@ -1,0 +1,11 @@
+{
+  "name": "@republic543/core",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Deterministic simulation core for REPUBLIC: 543",
+  "scripts": {
+    "build:core": "tsc -p tsconfig.core.json",
+    "test:core": "npm run build:core && node scripts/smoke-test.cjs"
+  },
+  "devDependencies": { "typescript": "^5.8.3" }
+}
