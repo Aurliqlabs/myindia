@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#f3efe5" />
+  <title>REPUBLIC: 543</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <section id="start-screen" class="start-screen">
+      <div class="paper-noise"></div>
+      <div class="start-topline"><span>POLITICS. PEOPLE. POWER.</span><span>INDIA PLAYS TOO.</span></div>
+      <div class="start-content">
+        <div class="logo-lockup">
+          <span class="logo-republic">REPUBLIC</span>
+          <span class="logo-543">543</span>
+        </div>
+        <p class="start-kicker">A political life simulation</p>
+        <h1>START AS NOBODY.<br><em>CHANGE THE REPUBLIC.</em></h1>
+        <p class="start-copy">Build a movement, hire people, survive pressure, fight elections, govern India—or become the very system you once opposed.</p>
+        <div class="start-actions">
+          <button id="new-game-btn" class="primary-brush">NEW GAME <span>→</span></button>
+          <button id="continue-btn" class="secondary-brush" disabled>CONTINUE</button>
+        </div>
+      </div>
+      <div class="start-footer"><span>2026 START</span><span>543 LOK SABHA SEATS</span><span>10-YEAR CAREER</span></div>
+    </section>
+
+    <section id="creator-screen" class="creator-screen hidden">
+      <div class="creator-card">
+        <div class="creator-head">
+          <button id="creator-back" class="icon-btn" aria-label="Back">←</button>
+          <div><small>NEW CAREER</small><h2>CREATE YOURSELF</h2></div>
+          <span class="step-chip">01 / 03</span>
+        </div>
+        <form id="creator-form">
+          <div class="form-grid">
+            <label><span>YOUR NAME</span><input id="player-name" required maxlength="40" placeholder="Enter your name" /></label>
+            <label><span>AGE</span><input id="player-age" required type="number" min="18" max="75" value="28" /></label>
+            <label><span>HOME STATE</span><select id="player-state"></select></label>
+            <label><span>PROFESSION</span><select id="player-profession">
+              <option>Private-sector employee</option><option>Student</option><option>Lawyer</option><option>Journalist</option><option>Entrepreneur</option><option>Doctor</option><option>Teacher</option><option>Engineer</option><option>Government employee</option><option>Unemployed</option>
+            </select></label>
+          </div>
+          <div class="trait-section">
+            <div class="section-label"><span>CHOOSE YOUR EDGE</span><small>Every advantage creates a weakness.</small></div>
+            <div id="trait-grid" class="trait-grid"></div>
+          </div>
+          <button class="primary-brush full" type="submit">BEGIN THE STORY <span>→</span></button>
+        </form>
+      </div>
+    </section>
+
+    <section id="intro-screen" class="intro-screen hidden">
+      <div class="intro-frame">
+        <div class="intro-date" id="intro-date"></div>
+        <div class="intro-tag">PROLOGUE</div>
+        <h2 id="intro-title"></h2>
+        <p id="intro-body"></p>
+        <div class="intro-progress"><span id="intro-progress-bar"></span></div>
+        <button id="intro-next" class="primary-brush">CONTINUE <span>→</span></button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="game-screen hidden">
+      <aside class="side-nav">
+        <div class="mini-logo"><b>R</b><span>543</span></div>
+        <nav id="nav-list"></nav>
+        <div class="side-bottom">
+          <div class="snapshot-label">REAL-WORLD SNAPSHOT</div>
+          <strong>25 SEP 2026</strong>
+          <small>Future history diverges after this date.</small>
+        </div>
+      </aside>
+
+      <main class="game-main">
+        <header class="topbar">
+          <div class="brand-word"><span>REPUBLIC</span><b>543</b></div>
+          <div class="top-slogan">STRATEGY BUILDS A BRIGHTER INDIA.</div>
+          <div class="top-right">
+            <div class="date-box"><small id="phase-label">PHASE: MOVEMENT</small><strong id="date-label">06 JUN 2026</strong></div>
+            <div class="level-box"><div class="avatar-mini" id="avatar-mini">YOU</div><div><b id="top-player-name">PLAYER</b><span>LV <i id="player-level">1</i></span></div></div>
+          </div>
+        </header>
+
+        <div class="news-strip"><b>BREAKING NEWS</b><div id="ticker-text" class="ticker-text"></div><span id="clock-text">11:49</span></div>
+
+        <div id="page-content"></div>
+      </main>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <script src="game.js"></script>
+</body>
+</html>
