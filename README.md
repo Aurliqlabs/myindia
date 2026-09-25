@@ -1,23 +1,22 @@
 # REPUBLIC: 543
 
-A browser-based political life simulation set in a fictional career in India. The Paper/Crimson prototype starts with a movement at Jantar Mantar and lets you build an organisation, make decisions, campaign across states, contest a simulated 543-seat election, and govern or work in opposition.
+A political career simulation that begins inside the real Cockroach Janta Party story. The reported timeline through 25 September 2026 is locked. On 26 September, the player enters as a **fictional organiser**; all subsequent actions and outcomes are alternate history.
 
-## Play locally
+## Play
 
-Open `index.html` in a browser. Saves stay in that browser. For a local development server, run `npm run dev` and open `http://localhost:3000` on the **same computer**.
+Open `index.html` locally, or run `npm run dev` and open `http://localhost:3000` on the same computer. Saves stay in the browser; export and import are available in Settings.
 
-## Gameplay implemented
+## Reality and simulation
 
-- Create a political character and choose a starting trait.
-- Decide how to respond to events, recruit volunteers, hire staff and manage monthly costs.
-- Start operations with delayed outcomes; track campaign donations and a decision history.
-- Found a party after meeting support, finance, credibility and volunteer milestones.
-- Target states with field visits and campaign tours. Simulated constituency results use the 543-seat state and union territory allocation recorded in `data/reality/lok-sabha-seats.json`.
-- Respond to an election result through government or opposition decisions.
-- Export and import a JSON career save.
+- `data/reality/historical-scenes.js` contains dated records with source links and status labels. It includes CJP's formation, Jantar Mantar protest, pressure-group decision, school campaigns, reported FIR and September Election Commission demand, as well as relevant national events.
+- A reported complaint or political allegation is explicitly attributed; it is not treated as a finding.
+- The player character, staff, finances, public-support gauges, post-handoff events and election outcomes are **simulated**. Starting amounts are gameplay estimates, not claims about CJP's accounts or membership.
+- The browser game and TypeScript simulation core are separate implementations for now. Integrating them is a development milestone.
 
-Historical dispatches through 25 September 2026 link to official sources. The 2024 government formation, May 2026 assembly results, June NEET re-examination and July–August Monsoon Session are immutable context; the player’s movement and response choices are fictional. After that date, conditional simulated events react to finances, legal exposure, fatigue and the election outcome. Election outcomes, the movement, its characters and other unsourced events are fictional. The browser gameplay is currently separate from the TypeScript simulation core under `src/core`; integrating them is the next architecture milestone.
+## Current systems
+
+Build operations and a team, manage funds and legal risk, respond to conditional future events, organise across states, and choose whether the pressure group should pursue electoral politics. Government and opposition phases open after a simulated election.
 
 ## Verification
 
-`npm run test:browser` checks the playable browser rules without dependencies. `npm install && npm run test:core` checks the TypeScript simulation engine and reality data.
+Run `npm install && npm run test:core` for the TypeScript engine, and `npm run test:browser` for the playable rules and timeline boundary.

@@ -13,11 +13,11 @@ export function createNewGame(opts:NewGameOptions):WorldState {
     friend_meera:friend("friend_meera","Meera Nair","Friend · Media",{media:81,communication:73,research:57},76,72),
     friend_sameer:friend("friend_sameer","Sameer Khanna","Friend · Business",{finance:77,fundraising:82,strategy:63},48,84)
   };
-  return{schemaVersion:1,seed,rngState:seed,date:"2026-06-06",realWorldSnapshotDate:opts.snapshotDate??"2026-09-25",day:1,phase:"movement",
+  return{schemaVersion:1,seed,rngState:seed,date:"2026-09-26",realWorldSnapshotDate:opts.snapshotDate??"2026-09-25",day:1,phase:"movement",
     player:{id:playerId,name:opts.name,age:opts.age,homeState:opts.homeState,profession:opts.profession,trait:opts.trait,skills:skills(opts.trait),energy:84,health:94,stress:22,sleepDebt:8,recognition:9,level:1,personalCash:180000,declaredAssets:180000,hiddenAssets:0},
-    organisation:{id:"org_cjp",name:"CJP",abbreviation:"CJP",phase:"movement",credibility:52,mediaHeat:18,legalExposure:7,volunteers:136,members:24,statePresence:{Delhi:12,Maharashtra:4,Kerala:3},finance:{organisationCash:42000,monthlyRecurringDonations:3000,monthlyOfficeCosts:0,monthlyTechnologyCosts:1600,monthlyTravelBaseline:4500,outstandingPayables:0,lifetimeRaised:42000,lifetimeSpent:0}},
+    organisation:{id:"org_cjp",name:"Cockroach Janta Party",abbreviation:"CJP",phase:"movement",credibility:52,mediaHeat:18,legalExposure:7,volunteers:136,members:24,statePresence:{Delhi:12,Maharashtra:4,Kerala:3},finance:{organisationCash:42000,monthlyRecurringDonations:3000,monthlyOfficeCosts:0,monthlyTechnologyCosts:1600,monthlyTravelBaseline:4500,outstandingPayables:0,lifetimeRaised:42000,lifetimeSpent:0}},
     characters,relationships:[],memories:[],operations:{},evidence:{},evidenceEdges:[],secrets:{},
     publicOpinion:{youth:22,students:27,urban:9,rural:3,women:7,workers:6,business:2,national:5,byState:{Delhi:12,Maharashtra:7,Kerala:6}},
     macro:{growth:65,inflation:48,unemployment:58,fiscalPressure:54,institutionalTrust:51,socialStability:67},
-    parties:{},scheduledEvents:[],completedEventIds:[],flags:{historical_intro_complete:true}};
+    parties:{},scheduledEvents:[],completedEventIds:[],flags:{historical_intro_complete:true,player_handoff_date:"2026-09-26",starting_metrics:"simulation_estimates"}};
 }

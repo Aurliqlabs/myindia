@@ -28,11 +28,14 @@ assert.equal(Object.values(result.byState).reduce((n,x)=>n+x.won,0),result.seats
 assert.ok(result.byState.Kerala.strength>JSON.parse(before).byState.Kerala.strength);
 vm.runInContext(`state.phase='government';state.org.funds=500000;performAction('services');`,context);
 assert.equal(vm.runInContext('state.governance.publicServices',context),52);
-vm.runInContext(`state.date='2026-06-20';state.day=15;advanceDay();`,context);
+vm.runInContext(`state.date='2026-09-25';state.day=15;advanceDay();`,context);
 state=vm.runInContext('state',context);
-assert.ok(state.pendingScenes.includes('neet-reexam-2026'));
+assert.equal(state.date,'2026-09-26');
+assert.equal(state.pendingScenes.length,0);
 assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.date<=REALITY_CUTOFF && x.url.startsWith("https://"))',context),true);
-assert.ok(vm.runInContext('REAL_SCENES.length',context)>=10);
+assert.ok(vm.runInContext('REAL_SCENES.length',context)>=18);
+assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.archive)',context),true);
+assert.ok(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-eci-demand" && x.date==="2026-09-24")',context));
 vm.runInContext(`state.date='2026-09-26';state.org.funds=0;`,context);
 assert.equal(vm.runInContext('nextDecision().title',context),'The payroll cliff');
 vm.runInContext(`state.org.funds=100000;state.org.legal=60;`,context);

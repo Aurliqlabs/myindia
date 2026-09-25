@@ -1,6 +1,56 @@
 /* Verified public events through 25 September 2026. Player responses are fictional. */
 const REAL_SCENES = Object.freeze([
   {
+    id:"cjp-founded",date:"2026-05-16",region:"Maharashtra",title:"Cockroach Janta Party takes shape",
+    fact:"After a Supreme Court hearing drew criticism, Abhijeet Dipke launched CJP as a satirical online movement on 16 May 2026.",scene:"A name born online becomes a sign-up form. Nobody yet knows whether it can survive outside a screen.",
+    source:"Indian Express",url:"https://indianexpress.com/article/india/cjp-protest-timeline-five-key-moments-dharmendra-pradhan-resignation-10803274/",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-jantar",date:"2026-06-06",region:"New Delhi",title:"CJP gathers at Jantar Mantar",
+    fact:"CJP founder Abhijeet Dipke and supporters protested at Jantar Mantar over examination-related concerns and demanded the Education Minister’s resignation.",scene:"A pavement becomes a political stage. Volunteers have to manage people, food, media and the limits of a permitted protest.",
+    source:"The Indian Express",url:"https://indianexpress.com/article/cities/delhi/cockroach-janta-party-abhijeet-dipke-delhi-airport-jantar-mantar-protest-10726512/",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-extension",date:"2026-06-20",region:"New Delhi",title:"The protest faces a police deadline",
+    fact:"Media reported that police declined an extension to CJP’s permitted Jantar Mantar protest and moved to clear the site.",scene:"A movement learns that the right to assemble also has permits, deadlines and tense conversations with police.",
+    source:"India Today",url:"https://www.indiatoday.in/india/story/cockroach-janta-party-protest-jantar-mantar-cjp-founder-abhijit-dipke-neet-paper-leak-education-minister-dharmendra-pradhan-delhi-police-2930592-2026-06-20",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-minister",date:"2026-07-25",region:"New Delhi",title:"An education minister resigns",
+    fact:"The Indian Express reported Dharmendra Pradhan’s resignation as Union Education Minister after the examination protests. The movement claimed a political victory.",scene:"Jubilation at the protest site is followed by a harder question: what does the movement do after a headline victory?",
+    source:"The Indian Express",url:"https://indianexpress.com/article/india/cjp-protest-timeline-five-key-moments-dharmendra-pradhan-resignation-10803274/",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-pressure-group",date:"2026-08-05",region:"Maharashtra",title:"CJP chooses pressure-group work",
+    fact:"At an August press conference, Abhijeet Dipke said CJP did not plan an immediate electoral entry and would work as a nationwide pressure group.",scene:"The organisation resists the quickest route to a ballot symbol. It needs a way to keep volunteers engaged between protests.",
+    source:"The Times of India",url:"https://timesofindia.indiatimes.com/city/aurangabad/cockroach-janta-party-rules-out-electoral-plunge-plans-nationwide-movement/articleshow/132959602.cms",status:"ATTRIBUTED STATEMENT",archive:true
+  },
+  {
+    id:"cjp-schools",date:"2026-08-15",region:"Maharashtra",title:"School Thik Karo expands the agenda",
+    fact:"CJP launched a school-focused social-audit campaign. Reported concerns about facilities required verification and responses from the relevant authorities.",scene:"A school gate is different from a protest stage. Evidence, permission and the dignity of teachers and children now matter.",
+    source:"India Today",url:"https://www.indiatoday.in/india/story/school-thik-karo-abhijeet-dipke-government-schools-maharashtra-ptag-2971917-2026-08-15",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-latur-fir",date:"2026-08-22",region:"Maharashtra",title:"An FIR follows a Latur school visit",
+    fact:"Police registered an FIR following a complaint about a CJP school visit in Latur. The complaint contains allegations; this archive records no finding of guilt.",scene:"Legal exposure is no longer abstract. Your future team will inherit the need for careful documentation and due process.",
+    source:"India Today",url:"https://www.indiatoday.in/india/story/abhijeet-dipke-maharashtra-latur-school-fir-cjp-fir-over-threats-teachers-2977633-2026-08-22",status:"UNDER INVESTIGATION",archive:true
+  },
+  {
+    id:"cjp-march-withdrawn",date:"2026-09-01",region:"New Delhi",title:"A planned march is withdrawn",
+    fact:"CJP withdrew its planned 5 September Delhi march after government assurances and Supreme Court proceedings concerning protest-related cases.",scene:"Sometimes de-escalation is a strategic choice. The promised resolution still needs to be watched.",
+    source:"The Indian Express",url:"https://indianexpress.com/article/legal-news/cjp-supreme-court-delhi-police-quash-cases-against-cjp-protesters-10858482/",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-adivasi-schools",date:"2026-09-16",region:"Maharashtra",title:"Adivasi School Thik Karo is announced",
+    fact:"Dipke announced an Adivasi School Thik Karo campaign focused on conditions in tribal-area schools. Reported deficiencies are campaign claims requiring local verification.",scene:"A small field team now faces questions that cannot be answered by a national slogan alone.",
+    source:"The Indian Express",url:"https://indianexpress.com/article/cities/mumbai/cjp-abhijeet-dipke-next-project-adivasi-school-thik-karo-campaign-maharashtra-10880843/",status:"REPORTED",archive:true
+  },
+  {
+    id:"cjp-eci-demand",date:"2026-09-24",region:"New Delhi",title:"CJP turns to electoral accountability",
+    fact:"CJP demanded Chief Election Commissioner Gyanesh Kumar’s resignation and said it could organise another Jantar Mantar protest. Its allegations about electoral-roll changes remain claims to examine, not established findings in this game.",scene:"The ultimatum is public. On the next day, your fictional career can begin with a live political question and no known outcome.",
+    source:"The Indian Express",url:"https://indianexpress.com/article/political-pulse/cjp-demands-election-commissioner-gyanesh-kumar-resignation-jantar-mantar-10892653/",status:"ATTRIBUTED CLAIM",archive:true
+  },
+  {
     id:'government-2024',date:'2024-06-09',region:'New Delhi',title:'A new Union government takes oath',
     fact:'Narendra Modi and the Council of Ministers were sworn in at Rashtrapati Bhavan on 9 June 2024.',
     scene:'The oath is already history when your story begins. Institutions, incumbents and opposition parties have established positions; a new movement enters this political landscape with no seats.',
@@ -82,4 +132,4 @@ const REAL_SCENES = Object.freeze([
       {label:'Return to local organising',detail:'Focus on direct contact with supporters.',effect:{volunteers:18,support:1,energy:-6}}
     ]
   }
-]);
+].map(scene=>Object.freeze({...scene,archive:true,choices:undefined})));
