@@ -36,20 +36,20 @@
         <div class="creator-head">
           <button id="creator-back" class="icon-btn" aria-label="Back">←</button>
           <div><small>NEW CAREER</small><h2>CREATE YOURSELF</h2></div>
-          <span class="step-chip">01 / 03</span>
+          <span class="step-chip">CITIZEN PROFILE</span>
         </div>
         <form id="creator-form">
           <div class="form-grid">
             <label><span>YOUR NAME</span><input id="player-name" required maxlength="40" placeholder="Enter your name" /></label>
             <label><span>AGE</span><input id="player-age" required type="number" min="18" max="75" value="28" /></label>
-            <label><span>HOME STATE</span><select id="player-state"></select></label>
+            <label><span>GENDER</span><select id="player-gender"><option>Prefer not to say</option><option>Woman</option><option>Man</option><option>Non-binary</option><option>Self-describe</option></select></label><label><span>HOME STATE</span><select id="player-state"></select></label><label><span>HOME DISTRICT</span><input id="player-district" maxlength="60" placeholder="District" /></label>
             <label><span>PROFESSION</span><select id="player-profession">
               <option>Private-sector employee</option><option>Student</option><option>Lawyer</option><option>Journalist</option><option>Entrepreneur</option><option>Doctor</option><option>Teacher</option><option>Engineer</option><option>Government employee</option><option>Unemployed</option>
-            </select></label>
+            </select></label><label><span>EDUCATION / BACKGROUND</span><input id="player-education" maxlength="100" placeholder="Your path so far" /></label><label><span>MONTHLY INCOME (₹)</span><input id="player-income" required type="number" min="0" max="10000000" value="35000" /></label><label><span>PERSONAL SAVINGS (₹)</span><input id="player-savings" required type="number" min="0" max="100000000" value="180000" /></label><label><span>MONTHLY LIVING COSTS (₹)</span><input id="player-living-costs" required type="number" min="0" max="10000000" value="22000" /></label><label><span>FAMILY / OTHER OBLIGATIONS</span><input id="player-family" maxlength="150" placeholder="Optional" /></label>
           </div>
           <div class="trait-section">
             <div class="section-label"><span>CHOOSE YOUR EDGE</span><small>Every advantage creates a weakness.</small></div>
-            <div id="trait-grid" class="trait-grid"></div>
+            <div id="trait-grid" class="trait-grid"></div><div class="section-label"><span>ALLOCATE UP TO 12 SKILL POINTS</span><small>Each attribute changes decisions in the simulation.</small></div><div class="form-grid"><label><span>COMMUNICATION</span><input id="skill-communication" type="number" min="0" max="12" value="0" /></label><label><span>STRATEGY</span><input id="skill-strategy" type="number" min="0" max="12" value="0" /></label><label><span>ANALYSIS</span><input id="skill-analysis" type="number" min="0" max="12" value="0" /></label><label><span>LEADERSHIP</span><input id="skill-leadership" type="number" min="0" max="12" value="0" /></label><label><span>NEGOTIATION</span><input id="skill-negotiation" type="number" min="0" max="12" value="0" /></label><label><span>COURAGE</span><input id="skill-courage" type="number" min="0" max="12" value="0" /></label></div>
           </div>
           <button class="primary-brush full" type="submit">BEGIN THE STORY <span>→</span></button>
         </form>

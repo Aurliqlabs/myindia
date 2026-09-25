@@ -45,6 +45,11 @@ vm.runInContext(`state.jantarCampaign={days:0,crowdTrust:38,studentTrust:35,evid
 assert.ok(vm.runInContext('state.jantarCampaign.crowdTrust<38 && state.jantarCampaign.legalPressure>0',context),'unsafe mobilisation must lower trust');
 vm.runInContext(`state.date='2026-07-21';chooseNegotiation('exam_reform',true,false);`,context);
 assert.equal(vm.runInContext('state.jantarCampaign.negotiation.demand',context),'exam_reform');
-console.log('Browser campaign and historical dispatch checks passed.');
+const profile=vm.runInContext(`buildCitizenProfile({name:'Citizen',age:28,homeState:'Kerala',profession:'Analyst',trait:'analyst',monthlyIncome:50000,savings:25000,monthlyLivingCosts:30000,points:{analysis:8,communication:4}})`,context);
+assert.equal(profile.skills.analysis,73);
+assert.equal(profile.monthlyIncome,50000);
+assert.throws(()=>vm.runInContext(`buildCitizenProfile({name:'Bad',age:28,trait:'speaker',monthlyIncome:1,savings:0,monthlyLivingCosts:0,points:{analysis:13}})`,context),/12 skill points/);
+assert.notEqual(vm.runInContext('TRAIT_SKILLS.analyst.communication',context),vm.runInContext('TRAIT_SKILLS.speaker.communication',context));
+console.log('Browser profile, campaign and historical dispatch checks passed.');
 
 
