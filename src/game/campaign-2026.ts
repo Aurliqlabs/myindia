@@ -14,7 +14,9 @@ export interface Campaign2026State {
 }
 
 export function campaign2026(world:WorldState):Campaign2026State {
-  return world.campaign2026??(world.campaign2026={daysOrganised:0,crowdTrust:38,studentTrust:35,evidenceQuality:20,legalPressure:0,fatigue:0,offers:0,historicalOutcomeRecorded:false});
+  const result=world.campaign2026??(world.campaign2026={daysOrganised:0,crowdTrust:38,studentTrust:35,evidenceQuality:20,legalPressure:0,fatigue:0,offers:0,historicalOutcomeRecorded:false});
+  if(world.flags.reported_ministerial_resignation)result.historicalOutcomeRecorded=true;
+  return result;
 }
 
 /** One field decision per day. Quality depends on the citizen's strengths and the actual preparations made. */
@@ -74,8 +76,9 @@ export function advanceCampaignDay(world:WorldState):DailyReport {
       world.flags.reported_ministerial_resignation=true;
       report.notes.push("Historical anchor: reported Education Minister resignation; player contribution remains simulated.");
     }
-    if(event.kind==="historical_event")world.completedEventIds.push(event.id);
+
   }
   return report;
 }
+
 

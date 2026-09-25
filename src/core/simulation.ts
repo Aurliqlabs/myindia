@@ -13,7 +13,7 @@ export function advanceOneDay(world:WorldState):DailyReport {
   report.notes.push(resolvePersonalDay(world));
   for(const op of Object.values(world.operations)){const delta=tickOperation(world,op,rng);if(delta>0)report.operationUpdates.push({id:op.id,progressDelta:delta,completed:op.status==="completed"});}
   for(const secret of Object.values(world.secrets)){const result=tickSecretExposure(world,secret,rng);report.secretExposureChecks.push({id:secret.id,...result});if(result.exposed)report.notes.push(`Secret exposed: ${secret.kind}`);}
-  const scheduled=world.scheduledEvents.filter(e=>e.date===world.date);report.triggeredEvents.push(...scheduled);world.scheduledEvents=world.scheduledEvents.filter(e=>e.date!==world.date);
+  const scheduled=world.scheduledEvents.filter(e=>e.date===world.date);report.triggeredEvents.push(...scheduled);for(const event of scheduled){if(event.kind==="historical_event"){if(!world.completedEventIds.includes(event.id))world.completedEventIds.push(event.id);world.flags[`historical_${event.id}`]=true;const flag=event.payload.anchorFlag;if(typeof flag==="string"&&flag.startsWith("reported_"))world.flags[flag]=true;report.notes.push(`Historical anchor: ${event.payload.title}`);}}world.scheduledEvents=world.scheduledEvents.filter(e=>e.date!==world.date);
   if(new Date(world.date)>=new Date(world.realWorldSnapshotDate)){const ev=generateSystemEvent(world,rng);if(ev){world.scheduledEvents.push(ev);report.notes.push(`Future event generated: ${ev.kind}`);}}
   if(isMonthEnd(world.date)){report.payroll=processMonthEnd(world);const personal=settlePersonalMonth(world);report.notes.push(`Personal salary ${personal.salary}; living costs ${personal.costs}; new debt ${personal.newDebt}`);}
   world.player.energy=clamp(world.player.energy-2.2-world.player.stress*.012);world.player.stress=clamp(world.player.stress+.8+(world.player.energy<30?1.8:0));world.player.sleepDebt=clamp(world.player.sleepDebt+.5,0,100);
@@ -22,4 +22,5 @@ export function advanceOneDay(world:WorldState):DailyReport {
   world.day+=1;world.date=isoAddDay(world.date);world.player.level=1+Math.floor((world.day-1)/30);world.rngState=rng.state();report.date=world.date;return report;
 }
 export function advanceDays(world:WorldState,days:number):DailyReport[]{if(days<0||days>3660)throw new Error("days must be between 0 and 3660");const reports:DailyReport[]=[];for(let i=0;i<days;i++)reports.push(advanceOneDay(world));return reports;}
+
 

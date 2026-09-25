@@ -39,25 +39,31 @@ const result=core.simulateConstituency({id:'x',name:'X',state:'S',electorate:100
 const audit=require('../dist/src/game/school-audit.js');
 const school=createRepublic543Game({name:'Auditor',age:28,homeState:'Maharashtra',profession:'Teacher',trait:'analyst',seed:543});
 core.receiveDonation(school,50000);
-assertAuditDate();
-function assertAuditDate(){let blocked=false;try{audit.openSchoolAudit(school,{district:'Fictional district',claim:'Composite facility complaint',leadId:'friend_asha',travelBudget:6000});}catch(e){blocked=true;}ok(blocked,'school audit must wait for documented campaign start');}
+let blockedEarly=false;try{audit.openSchoolAudit(school,{district:'Fictional district',claim:'Composite facility complaint',leadId:'friend_asha',travelBudget:6000});}catch(e){blockedEarly=true;}ok(blockedEarly,'school audit must wait for documented campaign start');
 school.date='2026-08-15';
 const caseFile=audit.openSchoolAudit(school,{district:'Fictional district',claim:'Composite report of damaged facilities',leadId:'friend_asha',travelBudget:6000});
 ok(caseFile.status==='UNVERIFIED'&&caseFile.fictionalComposite,'tip must remain a fictional unverified claim');
+let sameDay=false;try{audit.addSchoolEvidence(school,caseFile.id,{kind:'document',label:'Invented inspection sheet',origin:'field_sheet_1',confidence:.85,supports:true});}catch(e){sameDay=true;}ok(sameDay,'field visit must wait for travel');
+core.advanceOneDay(school);
 audit.addSchoolEvidence(school,caseFile.id,{kind:'document',label:'Invented inspection sheet',origin:'field_sheet_1',confidence:.85,supports:true});
+core.advanceOneDay(school);
 audit.addSchoolEvidence(school,caseFile.id,{kind:'witness',label:'Fictional parent interview',origin:'interview_1',confidence:.8,supports:true});
 let premature=false;try{audit.publishSchoolAudit(school,caseFile.id);}catch(e){premature=true;}ok(premature,'publication must require official response and legal review');
-audit.requestSchoolResponse(school,caseFile.id);
-audit.recordSchoolResponse(school,caseFile.id,'denied','Fictional authority disputes the description');
-audit.reviewSchoolAudit(school,caseFile.id,'friend_asha');
+core.advanceOneDay(school);audit.requestSchoolResponse(school,caseFile.id);
+core.advanceOneDay(school);audit.recordSchoolResponse(school,caseFile.id,'denied','Fictional authority disputes the description');
+core.advanceOneDay(school);audit.reviewSchoolAudit(school,caseFile.id,'friend_asha');
+core.advanceOneDay(school);
 ok(audit.publishSchoolAudit(school,caseFile.id)==='DISPUTED','denied claim remains disputed even with evidence');
 ok(school.evidenceEdges.length===2,'evidence graph connects independent sources to claim');
 const admitted=audit.openSchoolAudit(school,{district:'Other fictional district',claim:'Composite water supply complaint',leadId:'friend_rohan',travelBudget:5000});
+core.advanceOneDay(school);
 audit.addSchoolEvidence(school,admitted.id,{kind:'document',label:'Fictional maintenance log',origin:'maintenance_2',confidence:.9,supports:true});
+core.advanceOneDay(school);
 audit.addSchoolEvidence(school,admitted.id,{kind:'witness',label:'Fictional caretaker statement',origin:'caretaker_2',confidence:.85,supports:true});
-audit.requestSchoolResponse(school,admitted.id);
-audit.recordSchoolResponse(school,admitted.id,'acknowledged','Fictional authority confirms repair is needed');
-audit.reviewSchoolAudit(school,admitted.id,'friend_asha');
+core.advanceOneDay(school);audit.requestSchoolResponse(school,admitted.id);
+core.advanceOneDay(school);audit.recordSchoolResponse(school,admitted.id,'acknowledged','Fictional authority confirms repair is needed');
+core.advanceOneDay(school);audit.reviewSchoolAudit(school,admitted.id,'friend_asha');
+core.advanceOneDay(school);
 ok(audit.publishSchoolAudit(school,admitted.id)==='VERIFIED','corroborated and acknowledged simulated case may be verified');
 ok(core.deserializeWorld(core.serializeWorld(school)).schoolAudits[admitted.id].status==='VERIFIED','school audit must survive save round-trip');
 const citizen=core.createNewGame({name:'Worker',age:27,homeState:'Kerala',profession:'Private-sector employee',trait:'organiser',monthlyIncome:44000,personalSavings:1000,monthlyLivingCosts:23000});
@@ -75,6 +81,12 @@ ok(monthReport.notes.some(n=>n.includes('Personal salary')),'month-end salary an
 ok(citizen.player.personalCash!==baseCash||citizen.life.personalDebt>0,'personal finances must change after month end');
 const legacy=JSON.parse(core.serializeWorld(citizen));delete legacy.life;delete legacy.player.monthlyIncome;
 ok(core.deserializeWorld(JSON.stringify(legacy)).life&&core.deserializeWorld(JSON.stringify(legacy)).player.monthlyIncome===35000,'old saves must hydrate new personal fields');
+const genericAnchor=createRepublic543Game({name:'Archive',age:26,homeState:'Delhi',profession:'Student',trait:'analyst'});
+while(genericAnchor.date<='2026-07-25')core.advanceOneDay(genericAnchor);
+ok(genericAnchor.flags.reported_ministerial_resignation===true,'ordinary time advance must install reported July anchor');
+ok(genericAnchor.completedEventIds.filter(id=>id==='cjp_2026_07_25_minister_resignation').length===1,'historical anchors fire once');
+ok(campaign.campaign2026(genericAnchor).historicalOutcomeRecorded,'campaign view must hydrate the fixed anchor');
 console.log('REPUBLIC: 543 core smoke tests passed');
+
 
 

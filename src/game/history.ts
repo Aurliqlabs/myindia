@@ -16,7 +16,8 @@ export function installHistoricalTimeline(world:WorldState,events:HistoricalEven
         status:event.status,
         sourceIds:event.sourceIds,
         tags:event.tags,
-        playable:event.playable
+        playable:event.playable,
+        anchorFlag:event.anchorFlag
       }
     };
     world.scheduledEvents.push(scheduled);
@@ -27,3 +28,4 @@ export function installHistoricalTimeline(world:WorldState,events:HistoricalEven
 export function pendingHistoricalEvents(world:WorldState):ScheduledEvent[]{
   return world.scheduledEvents.filter(e=>e.kind==="historical_event"&&e.date>=world.date).sort((a,b)=>a.date.localeCompare(b.date));
 }
+

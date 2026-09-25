@@ -18,6 +18,7 @@ export interface HistoricalEventRecord {
   sourceIds:string[];
   tags:string[];
   playable:boolean;
+  anchorFlag?:string;
 }
 
 export interface HistoricalOperationTemplate {
@@ -32,3 +33,4 @@ export interface HistoricalOperationTemplate {
   startingLegalRisk:number;
   startingPublicMomentum:number;
 }
+

@@ -71,7 +71,21 @@ assert.equal(browser.org.funds,parity.organisation.finance.organisationCash);
 assert.equal(browser.org.volunteers,parity.organisation.volunteers);
 assert.equal(browser.jantarCampaign.crowdTrust,parity.campaign2026.crowdTrust);
 assert.equal(browser.jantarCampaign.legalPressure,parity.campaign2026.legalPressure);
-console.log('Browser and core campaign parity checks passed.');
-
+vm.runInContext(`state.date='2026-08-15';state.org.funds=60000;state.schoolAudits=[];schoolAuditAction('open');`,context);
+let audit=vm.runInContext('state.schoolAudits[0]',context);
+assert.equal(audit.status,'UNVERIFIED');
+assert.equal(audit.fictionalComposite,true);
+assert.throws(()=>vm.runInContext("schoolAuditAction('publish','audit-1')",context),/Legal review/);
+vm.runInContext(`schoolAuditAction('document','audit-1');schoolAuditAction('witness','audit-1');schoolAuditAction('request','audit-1');schoolAuditAction('response','audit-1','denied');schoolAuditAction('review','audit-1');schoolAuditAction('publish','audit-1');`,context);
+audit=vm.runInContext('state.schoolAudits[0]',context);
+assert.equal(audit.status,'DISPUTED','official denial must remain disputed');
+assert.ok(audit.publishedOn>audit.openedOn,'audit takes multiple days');
+assert.throws(()=>vm.runInContext("schoolAuditAction('document','audit-1')",context),/closed/);
+vm.runInContext("schoolAuditAction('open');schoolAuditAction('document','audit-2');schoolAuditAction('witness','audit-2');schoolAuditAction('request','audit-2');schoolAuditAction('response','audit-2','acknowledged');schoolAuditAction('review','audit-2');schoolAuditAction('publish','audit-2');",context);
+assert.equal(vm.runInContext('state.schoolAudits[0].status',context),'VERIFIED');
+vm.runInContext("schoolAuditAction('open');schoolAuditAction('document','audit-3');schoolAuditAction('request','audit-3');schoolAuditAction('response','audit-3','acknowledged');schoolAuditAction('review','audit-3');",context);
+assert.throws(()=>vm.runInContext("schoolAuditAction('publish','audit-3')",context),/document and witness/);
+assert.ok(saved['republic543-save'].includes('fictionalComposite'));
+console.log('Browser campaign parity and school-audit checks passed.');
 
 

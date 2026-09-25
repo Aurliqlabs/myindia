@@ -14,7 +14,7 @@ export const movementSources:SourceRecord[]=[
 ];
 
 export const movementTimeline2026:HistoricalEventRecord[]=[
-  {id:"cjp_2026_07_25_minister_resignation",date:"2026-07-25",title:"Education Minister resigns",summary:"The Indian Express reported Dharmendra Pradhan resigned as Union Education Minister. CJP called it a victory; the player character’s contribution is simulated.",status:"VERIFIED",sourceIds:["ie_2026_07_26_resignation"],tags:["cjp","education","resignation"],playable:true},
+  {id:"cjp_2026_07_25_minister_resignation",date:"2026-07-25",title:"Education Minister resigns",summary:"The Indian Express reported Dharmendra Pradhan resigned as Union Education Minister. CJP called it a victory; the player character’s contribution is simulated.",status:"VERIFIED",sourceIds:["ie_2026_07_26_resignation"],tags:["cjp","education","resignation"],playable:true,anchorFlag:"reported_ministerial_resignation"},
   {id:"cjp_2026_06_06_jantar_permission",date:"2026-06-06",title:"Jantar Mantar protest receives permission",summary:"CJP's first major on-ground protest proceeds at Jantar Mantar after Delhi Police permission is obtained.",status:"VERIFIED",sourceIds:["ie_2026_06_06_permission"],tags:["cjp","jantar_mantar","education","protest"],playable:true},
   {id:"cjp_2026_06_07_national_mobilisation",date:"2026-06-07",title:"Movement announces wider mobilisation",summary:"After the first Delhi protest, CJP announces plans to mobilise across India and return for further protests if its demands are not met.",status:"VERIFIED",sourceIds:["ie_2026_06_07_expand"],tags:["cjp","mobilisation","national_expansion"],playable:true},
   {id:"cjp_2026_06_20_extension_denied",date:"2026-06-20",title:"Protest extension denied",summary:"Delhi Police declines an extension request and moves to clear the protest site after the permitted period.",status:"OFFICIAL_RECORD",sourceIds:["it_2026_06_20_clear"],tags:["cjp","jantar_mantar","police","legal"],playable:true},
@@ -33,3 +33,4 @@ export const historicalOperationTemplates:HistoricalOperationTemplate[]=[
   {id:"op_latur_legal",eventId:"cjp_2026_08_22_latur_fir",kind:"legal_challenge",title:"The Latur FIR",location:"Latur, Maharashtra",suggestedBudget:70000,targetProgress:100,startingMediaAttention:48,startingLegalRisk:55,startingPublicMomentum:35},
   {id:"op_rajasthan_school",eventId:"cjp_2026_08_22_rajasthan_confrontation",kind:"state_visit",title:"Rajasthan: Escalate or Verify",location:"Jaipur, Rajasthan",suggestedBudget:75000,targetProgress:100,startingMediaAttention:44,startingLegalRisk:30,startingPublicMomentum:36}
 ];
+
