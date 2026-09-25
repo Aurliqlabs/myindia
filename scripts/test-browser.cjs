@@ -35,6 +35,7 @@ assert.equal(state.pendingScenes.length,0);
 assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.date<=REALITY_CUTOFF && x.url.startsWith("https://"))',context),true);
 assert.ok(vm.runInContext('REAL_SCENES.length',context)>=18);
 assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.archive)',context),true);
+assert.equal(vm.runInContext('REAL_SCENES.every((x,i,a)=>i===0||a[i-1].date<=x.date)',context),true);
 assert.ok(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-eci-demand" && x.date==="2026-09-24")',context));
 vm.runInContext(`state.date='2026-09-26';state.org.funds=0;`,context);
 assert.equal(vm.runInContext('nextDecision().id',context),'handoff-eci');

@@ -132,4 +132,4 @@ const REAL_SCENES = Object.freeze([
       {label:'Return to local organising',detail:'Focus on direct contact with supporters.',effect:{volunteers:18,support:1,energy:-6}}
     ]
   }
-].map(scene=>Object.freeze({...scene,archive:true,choices:undefined})));
+].map(scene=>Object.freeze({...scene,archive:true,choices:undefined})).sort((a,b)=>a.date.localeCompare(b.date)));
