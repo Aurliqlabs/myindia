@@ -6,3 +6,25 @@
 @media(max-width:1100px){.hero-grid,.content-grid{grid-template-columns:1fr}.people-row{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.game-screen{grid-template-columns:1fr}.side-nav{display:none}.game-main{padding:0 10px 12px}.top-slogan{display:none}.topbar{gap:8px}.brand-word{font-size:28px}.top-right{margin-left:auto}.date-box{display:none}.hero-copy{width:96%;padding:20px}.hero-card{min-height:430px}.hero-statbar{grid-template-columns:1fr 1fr}.statbox:nth-child(2){border-right:0}.statbox:nth-child(-n+2){border-bottom:1px solid var(--line)}.operation-body{grid-template-columns:1fr}.people-row{grid-template-columns:1fr 1fr}.form-grid,.trait-grid,.generic-page{grid-template-columns:1fr}.creator-card{padding:18px}.intro-frame{padding:28px}.start-footer{display:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+/* Career management screens */
+.management-page{display:grid;gap:18px;align-content:start;padding-bottom:32px}
+.management-stats{display:flex;flex-wrap:wrap;gap:12px}
+.management-metric{flex:1 1 145px;min-width:145px;background:#fffdf8;border:1px solid #d8d1c2;padding:17px 20px;display:flex;flex-direction:column;gap:7px}
+.management-metric small{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#746d63}
+.management-metric strong{font-family:'Barlow Condensed',sans-serif;font-size:30px;color:#a3212a}
+.management-panel{padding:23px}
+.management-panel p{line-height:1.55;color:#514b43}
+.management-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.management-actions button,.project-card button,.modal-close{cursor:pointer;border:1px solid #9d222b;background:#9d222b;color:white;padding:12px 16px;font:700 12px 'IBM Plex Mono',monospace;letter-spacing:.02em}
+.management-actions button:hover,.project-card button:hover,.modal-close:hover{background:#761720}
+.management-actions button:disabled{opacity:.4;cursor:not-allowed}
+.project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.project-card{border:1px solid #d8d1c2;background:#fffdf8;padding:18px;display:flex;flex-direction:column;gap:9px}
+.project-card strong,.history-list strong{font-family:'Barlow Condensed',sans-serif;font-size:20px;text-transform:uppercase}
+.project-card p{margin:0;flex:1}.project-card small,.history-list small{font:600 10px 'IBM Plex Mono',monospace;color:#9d222b}
+.project-card button{margin-top:8px}
+.history-list{display:grid;gap:10px;margin-top:16px}.history-list>div{border-left:3px solid #9d222b;background:#fffdf8;padding:12px 15px;display:flex;flex-direction:column;gap:4px}.history-list p{margin:0}
+.people-management{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}.people-management>div{background:#fffdf8;border:1px solid #d8d1c2;padding:16px;display:flex;flex-direction:column;gap:6px}.people-management small{color:#655f56}.people-management span{font:600 10px 'IBM Plex Mono',monospace;color:#9d222b}
+.modal-close{margin-top:12px;background:transparent;color:#9d222b}
+
+.state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:16px}.state-grid>div{display:flex;flex-direction:column;gap:5px;border:1px solid #d8d1c2;background:#fffdf8;padding:12px}.state-grid strong{font-family:"Barlow Condensed",sans-serif;font-size:17px}.state-grid small,.state-grid span{font:600 11px "IBM Plex Mono",monospace;color:#6f675f}.management-actions label{display:flex;align-items:center;gap:10px;font:600 12px "IBM Plex Mono",monospace}.management-actions select{min-width:180px;max-width:260px;padding:10px;background:#fffdf8;border:1px solid #b7ac9d;color:#24211d}.history-list details{margin-top:8px}.history-list summary{cursor:pointer;font:600 12px "IBM Plex Mono",monospace;color:#9d222b}
