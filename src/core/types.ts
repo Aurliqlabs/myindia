@@ -4,6 +4,7 @@ export type EvidenceStatus = "VERIFIED"|"OFFICIAL_RECORD"|"COURT_FINDING"|"UNDER
 export type SkillKey = "communication"|"strategy"|"analysis"|"leadership"|"negotiation"|"courage";
 export type StaffSkillKey = SkillKey|"legal"|"media"|"finance"|"research"|"field"|"fundraising";
 export type TraitId = "speaker"|"analyst"|"organiser"|"legal_mind"|"outsider"|"connector";
+export type OrgRole = "founder"|"chief_of_staff"|"general_secretary"|"legal_lead"|"research_lead"|"media_lead"|"finance_lead"|"field_organiser"|"state_coordinator"|"district_coordinator"|"volunteer";
 
 export interface PlayerProfile {
   id: Id; name: string; age: number; homeState: string; profession: string; trait: TraitId;
@@ -11,17 +12,32 @@ export interface PlayerProfile {
   skills: Record<SkillKey,number>; energy:number; health:number; stress:number; sleepDebt:number;
   recognition:number; level:number; personalCash:number; declaredAssets:number; hiddenAssets:number;
 }
-export interface CharacterPsychology { ambition:number; integrity:number; greed:number; fear:number; ego:number; riskTolerance:number; }
+export interface CharacterPsychology { ambition:number; integrity:number; greed:number; fear:number; ego:number; riskTolerance:number; ideologicalCommitment:number; }
+export type CharacterRequestType="raise"|"promotion"|"ticket";
+export interface CharacterRequest { type:CharacterRequestType; askedOn:string; detail:string; amount?:number; targetRole?:OrgRole; }
 export interface CharacterState {
   id:Id; name:string; age:number; role:string; salaryMonthly:number; skills:Partial<Record<StaffSkillKey,number>>;
   energy:number; health:number; stress:number; morale:number; psychology:CharacterPsychology;
   employed:boolean; volunteer:boolean; joinedOn:string;
+  homeState?:string; background?:string; roleId?:OrgRole;
+  unpaidStreak?:number; pendingRequest?:CharacterRequest; onLeaveUntil?:string; lastPromotionOn?:string; foundingMember?:boolean; burnoutStreak?:number;
 }
 export interface RelationshipState {
   actorA:Id; actorB:Id; trust:number; loyalty:number; personal:number; ideologicalAlignment:number; fear:number; resentment:number;
 }
-export type MemoryType = "promotion"|"firing"|"betrayal"|"support"|"humiliation"|"financial_favour"|"legal_protection"|"denied_request"|"political_ticket"|"overwork"|"salary_missed";
-export interface CharacterMemory { id:Id; characterId:Id; date:string; type:MemoryType; salience:number; note:string; }
+export type MemoryType = "promotion"|"firing"|"betrayal"|"support"|"humiliation"|"financial_favour"|"legal_protection"|"denied_request"|"political_ticket"|"overwork"|"salary_missed"|"founding_recognition"|"skill_growth"|"resignation"|"burnout";
+export interface CharacterMemory {
+  id:Id; characterId:Id; date:string; type:MemoryType; salience:number; note:string;
+  involvedIds?:Id[]; emotionalValence?:number; decay?:number; politicalRelevance?:number;
+}
+export interface RoleProfile { id:OrgRole; title:string; level:number; primarySkill:StaffSkillKey; responsibilityWeight:number; }
+export type CareerEventType="skill_growth"|"burnout_leave"|"raise_request"|"promotion_request"|"ticket_request"|"resignation"|"illness"|"mistake"|"payroll_response";
+export interface CareerEvent { id:Id; characterId:Id; date:string; type:CareerEventType; note:string; }
+export interface CandidateProfile {
+  id:Id; name:string; age:number; homeState:string; background:string;
+  trueSkills:Partial<Record<StaffSkillKey,number>>; truePsychology:CharacterPsychology; interviewLevel:number; generatedOn:string;
+}
+export interface CandidateImpression { headline:string[]; estimatedSkills:Partial<Record<StaffSkillKey,"weak"|"average"|"strong"|"excellent">>; concerns:string[]; }
 
 export interface FinanceState {
   organisationCash:number; monthlyRecurringDonations:number; monthlyOfficeCosts:number; monthlyTechnologyCosts:number;
@@ -62,6 +78,7 @@ export interface WorldState {
   memories:CharacterMemory[]; operations:Record<Id,OperationState>; evidence:Record<Id,EvidenceNode>; evidenceEdges:EvidenceEdge[];
   secrets:Record<Id,SecretState>; publicOpinion:PublicOpinionState; macro:MacroState; parties:Record<Id,PartyState>;
   scheduledEvents:ScheduledEvent[]; completedEventIds:Id[]; flags:Record<string,boolean|number|string>;
+  characterEvents:CareerEvent[]; recruitmentPool:CandidateProfile[];
   campaign2026?:import("../game/campaign-2026").Campaign2026State;
   schoolAudits?:Record<Id,import("../game/school-audit").SchoolAuditCase>;
   life?:import("./personal-life").PersonalLifeState;
