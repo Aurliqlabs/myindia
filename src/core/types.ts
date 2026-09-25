@@ -38,7 +38,7 @@ export interface OperationState {
   publicMomentum:number; status:"planned"|"active"|"paused"|"completed"|"failed";
 }
 export type EvidenceKind = "document"|"transaction"|"witness"|"message"|"contract"|"meeting"|"public_record";
-export interface EvidenceNode { id:Id; caseId:Id; kind:EvidenceKind; label:string; confidence:number; visibility:"private"|"team"|"public"|"authorities"; }
+export interface EvidenceNode { id:Id; caseId:Id; kind:EvidenceKind; label:string; confidence:number; visibility:"private"|"team"|"public"|"authorities"; origin?:string; collectedOn?:string; classification?:EvidenceStatus; }
 export interface EvidenceEdge { id:Id; from:Id; to:Id; relation:string; confidence:number; }
 export type SecretKind = "hidden_donation"|"illegal_favour"|"nepotism"|"obstruction"|"misuse_of_funds"|"abuse_of_power";
 export interface SecretState {
@@ -63,9 +63,11 @@ export interface WorldState {
   secrets:Record<Id,SecretState>; publicOpinion:PublicOpinionState; macro:MacroState; parties:Record<Id,PartyState>;
   scheduledEvents:ScheduledEvent[]; completedEventIds:Id[]; flags:Record<string,boolean|number|string>;
   campaign2026?:import("../game/campaign-2026").Campaign2026State;
+  schoolAudits?:Record<Id,import("../game/school-audit").SchoolAuditCase>;
 }
 export interface NewGameOptions { name:string; age:number; homeState:string; profession:string; trait:TraitId; seed?:number; snapshotDate?:string; gender?:string; homeDistrict?:string; education?:string; familyBackground?:string; monthlyIncome?:number; personalSavings?:number; monthlyLivingCosts?:number; skillPoints?:Partial<Record<SkillKey,number>>; }
 export interface DailyReport {
   date:string; payroll?:{due:number;paid:number;shortfall:number}; operationUpdates:Array<{id:Id;progressDelta:number;completed:boolean}>;
   secretExposureChecks:Array<{id:Id;exposed:boolean;roll:number;threshold:number}>; triggeredEvents:ScheduledEvent[]; notes:string[];
 }
+

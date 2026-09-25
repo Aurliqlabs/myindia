@@ -36,4 +36,29 @@ ok(anchor&&field.flags.reported_ministerial_resignation===true,'documented outco
 const roundTrip=core.deserializeWorld(core.serializeWorld(w));ok(roundTrip.day===w.day,'save round-trip failed');
 const parties=[{id:'a',name:'A',abbreviation:'A',nationalOrganisation:60,funds:1,leadershipStrength:50,baseSupport:40},{id:'b',name:'B',abbreviation:'B',nationalOrganisation:50,funds:1,leadershipStrength:50,baseSupport:35}];
 const result=core.simulateConstituency({id:'x',name:'X',state:'S',electorate:1000000,turnoutBase:68,partyBaseline:{a:44,b:40},volatility:5},parties,{nationalSwing:{},organisationByParty:{}},createRng(10));ok(['a','b'].includes(result.winnerPartyId),'election must produce a winner');
+const audit=require('../dist/src/game/school-audit.js');
+const school=createRepublic543Game({name:'Auditor',age:28,homeState:'Maharashtra',profession:'Teacher',trait:'analyst',seed:543});
+core.receiveDonation(school,50000);
+assertAuditDate();
+function assertAuditDate(){let blocked=false;try{audit.openSchoolAudit(school,{district:'Fictional district',claim:'Composite facility complaint',leadId:'friend_asha',travelBudget:6000});}catch(e){blocked=true;}ok(blocked,'school audit must wait for documented campaign start');}
+school.date='2026-08-15';
+const caseFile=audit.openSchoolAudit(school,{district:'Fictional district',claim:'Composite report of damaged facilities',leadId:'friend_asha',travelBudget:6000});
+ok(caseFile.status==='UNVERIFIED'&&caseFile.fictionalComposite,'tip must remain a fictional unverified claim');
+audit.addSchoolEvidence(school,caseFile.id,{kind:'document',label:'Invented inspection sheet',origin:'field_sheet_1',confidence:.85,supports:true});
+audit.addSchoolEvidence(school,caseFile.id,{kind:'witness',label:'Fictional parent interview',origin:'interview_1',confidence:.8,supports:true});
+let premature=false;try{audit.publishSchoolAudit(school,caseFile.id);}catch(e){premature=true;}ok(premature,'publication must require official response and legal review');
+audit.requestSchoolResponse(school,caseFile.id);
+audit.recordSchoolResponse(school,caseFile.id,'denied','Fictional authority disputes the description');
+audit.reviewSchoolAudit(school,caseFile.id,'friend_asha');
+ok(audit.publishSchoolAudit(school,caseFile.id)==='DISPUTED','denied claim remains disputed even with evidence');
+ok(school.evidenceEdges.length===2,'evidence graph connects independent sources to claim');
+const admitted=audit.openSchoolAudit(school,{district:'Other fictional district',claim:'Composite water supply complaint',leadId:'friend_rohan',travelBudget:5000});
+audit.addSchoolEvidence(school,admitted.id,{kind:'document',label:'Fictional maintenance log',origin:'maintenance_2',confidence:.9,supports:true});
+audit.addSchoolEvidence(school,admitted.id,{kind:'witness',label:'Fictional caretaker statement',origin:'caretaker_2',confidence:.85,supports:true});
+audit.requestSchoolResponse(school,admitted.id);
+audit.recordSchoolResponse(school,admitted.id,'acknowledged','Fictional authority confirms repair is needed');
+audit.reviewSchoolAudit(school,admitted.id,'friend_asha');
+ok(audit.publishSchoolAudit(school,admitted.id)==='VERIFIED','corroborated and acknowledged simulated case may be verified');
+ok(core.deserializeWorld(core.serializeWorld(school)).schoolAudits[admitted.id].status==='VERIFIED','school audit must survive save round-trip');
 console.log('REPUBLIC: 543 core smoke tests passed');
+
