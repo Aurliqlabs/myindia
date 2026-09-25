@@ -50,6 +50,8 @@ assert.equal(profile.skills.analysis,73);
 assert.equal(profile.monthlyIncome,50000);
 assert.throws(()=>vm.runInContext(`buildCitizenProfile({name:'Bad',age:28,trait:'speaker',monthlyIncome:1,savings:0,monthlyLivingCosts:0,points:{analysis:13}})`,context),/12 skill points/);
 assert.notEqual(vm.runInContext('TRAIT_SKILLS.analyst.communication',context),vm.runInContext('TRAIT_SKILLS.speaker.communication',context));
+vm.runInContext(`state.date='2026-05-14';`,context);
+assert.equal(vm.runInContext('sceneArchiveHTML().includes("An education minister resigns")',context),false,'future source records must not spoil the player timeline');
 console.log('Browser profile, campaign and historical dispatch checks passed.');
 
 
