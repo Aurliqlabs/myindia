@@ -7,7 +7,8 @@
     "dev": "node scripts/dev-server.mjs",
     "build:core": "tsc -p tsconfig.core.json && node scripts/copy-shared.cjs",
     "validate:data": "node scripts/validate-reality-data.cjs",
-    "test:core": "npm run build:core && node scripts/smoke-test.cjs && npm run validate:data",
+    "test:people": "node scripts/people-test.cjs",
+    "test:core": "npm run build:core && node scripts/smoke-test.cjs && npm run test:people && npm run validate:data",
     "test:browser": "node scripts/test-browser.cjs"
   },
   "devDependencies": {
