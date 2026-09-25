@@ -2,6 +2,7 @@ import type { DailyReport, WorldState } from "../core/types";
 import { clamp } from "../core/math";
 import { advanceOneDay } from "../core/simulation";
 import { jantarReadiness } from "./opening";
+import { resolveFieldDay, resolveNegotiation } from "../shared/campaign-rules";
 
 export type CampaignFocus="student_help"|"document_demands"|"mobilise";
 export type NegotiationDemand="exam_reform"|"protester_protection"|"ministerial_accountability";
@@ -23,35 +24,25 @@ export function organiseProtestDay(world:WorldState,focus:CampaignFocus,delegate
   const c=campaign2026(world);
   if(c.lastActionDate===world.date)throw new Error("A field decision was already made today");
   if(!["student_help","document_demands","mobilise"].includes(focus))throw new Error("Unknown campaign focus");
-  const cost={student_help:3800,document_demands:2800,mobilise:6500}[focus];
-  if(world.organisation.finance.organisationCash<cost)throw new Error("Insufficient movement funds");
   const delegate=delegateId?world.characters[delegateId]:undefined;
   if(delegateId&&!delegate)throw new Error("Unknown delegate");
   const skillKey=focus==="student_help"?"leadership":focus==="document_demands"?"analysis":"communication";
-  const skill=delegate?.skills[skillKey]??world.player.skills[skillKey];
   const readiness=jantarReadiness(world);
-  const quality=clamp((skill-45)/8+(readiness.prepared-4)*.65-(c.fatigue/18));
-  world.organisation.finance.organisationCash-=cost;
-  world.organisation.finance.lifetimeSpent+=cost;
+  const result=resolveFieldDay({focus,skill:delegate?.skills[skillKey]??world.player.skills[skillKey],prepared:readiness.prepared,crowdSafety:readiness.crowdSafety,fatigue:c.fatigue,delegated:!!delegate});
+  if(world.organisation.finance.organisationCash<result.cost)throw new Error("Insufficient movement funds");
+  world.organisation.finance.organisationCash-=result.cost;
+  world.organisation.finance.lifetimeSpent+=result.cost;
   c.daysOrganised++;
   c.lastActionDate=world.date;
-  c.fatigue=clamp(c.fatigue+(delegate?1:4));
-  if(delegate){delegate.energy=clamp(delegate.energy-7);delegate.stress=clamp(delegate.stress+3);}
-  else {world.player.energy=clamp(world.player.energy-9);world.player.jobStanding=clamp(world.player.jobStanding-2);world.player.stress=clamp(world.player.stress+3);}
-  if(focus==="student_help"){
-    c.studentTrust=clamp(c.studentTrust+3+quality);
-    c.crowdTrust=clamp(c.crowdTrust+(readiness.crowdSafety?2:-3));
-    if(!readiness.crowdSafety)c.legalPressure=clamp(c.legalPressure+2);
-  }else if(focus==="document_demands"){
-    c.evidenceQuality=clamp(c.evidenceQuality+4+quality);
-    c.studentTrust=clamp(c.studentTrust+1);
-  }else{
-    const unsafe=!readiness.crowdSafety;
-    world.organisation.volunteers=Math.max(0,world.organisation.volunteers+(unsafe?2:Math.round(7+quality)));
-    c.crowdTrust=clamp(c.crowdTrust+(unsafe?-6:2+quality));
-    c.legalPressure=clamp(c.legalPressure+(unsafe?6:1));
-    world.organisation.mediaHeat=clamp(world.organisation.mediaHeat+4);
-  }
+  c.fatigue=clamp(c.fatigue+result.fatigue);
+  c.crowdTrust=clamp(c.crowdTrust+result.crowdTrust);
+  c.studentTrust=clamp(c.studentTrust+result.studentTrust);
+  c.evidenceQuality=clamp(c.evidenceQuality+result.evidenceQuality);
+  c.legalPressure=clamp(c.legalPressure+result.legalPressure);
+  world.organisation.volunteers=Math.max(0,world.organisation.volunteers+result.volunteers);
+  world.organisation.mediaHeat=clamp(world.organisation.mediaHeat+result.mediaHeat);
+  if(delegate){delegate.energy=clamp(delegate.energy-result.energy);delegate.stress=clamp(delegate.stress+3);}
+  else {world.player.energy=clamp(world.player.energy-result.energy);world.player.jobStanding=clamp(world.player.jobStanding-result.jobStanding);world.player.stress=clamp(world.player.stress+3);}
   return c;
 }
 
@@ -64,9 +55,12 @@ export function negotiate2026(world:WorldState,input:{demand:NegotiationDemand;p
   if(input.delegateId&&!world.characters[input.delegateId])throw new Error("Unknown delegate");
   c.negotiation={...input,date:world.date};
   const skill=input.delegateId?(world.characters[input.delegateId].skills.negotiation??45):world.player.skills.negotiation;
-  c.offers=clamp(25+Math.round(skill/5)+Math.round(c.evidenceQuality/4)+Math.round(c.studentTrust/7)-Math.round(c.legalPressure/3));
-  if(input.pauseDemonstrations){c.fatigue=clamp(c.fatigue-12);c.crowdTrust=clamp(c.crowdTrust-3);}
-  if(input.publicBriefing){world.organisation.mediaHeat=clamp(world.organisation.mediaHeat+5);world.player.stress=clamp(world.player.stress+3);}
+  const result=resolveNegotiation({skill,evidenceQuality:c.evidenceQuality,studentTrust:c.studentTrust,legalPressure:c.legalPressure,pauseDemonstrations:input.pauseDemonstrations,publicBriefing:input.publicBriefing});
+  c.offers=result.offers;
+  c.fatigue=clamp(c.fatigue+result.fatigue);
+  c.crowdTrust=clamp(c.crowdTrust+result.crowdTrust);
+  world.organisation.mediaHeat=clamp(world.organisation.mediaHeat+result.mediaHeat);
+  world.player.stress=clamp(world.player.stress+result.stress);
   world.flags.negotiation_demand=input.demand;
   return c;
 }
@@ -84,3 +78,4 @@ export function advanceCampaignDay(world:WorldState):DailyReport {
   }
   return report;
 }
+

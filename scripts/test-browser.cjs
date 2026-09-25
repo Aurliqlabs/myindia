@@ -6,6 +6,7 @@ const saved={};
 const context={console,Date,Math,Intl,localStorage:{setItem:(key,value)=>{saved[key]=value;}},document:{querySelector:()=>({textContent:'',innerHTML:'',style:{},classList:{add(){},remove(){}}})},setTimeout:()=>0,clearTimeout:()=>{}};
 vm.createContext(context);
 vm.runInContext(fs.readFileSync('data/reality/historical-scenes.js','utf8'),context);
+vm.runInContext(fs.readFileSync('src/shared/campaign-rules.js','utf8'),context);
 vm.runInContext(source,context);
 vm.runInContext(`state={date:'2026-06-06',day:1,phase:'movement',player:{name:'Test',energy:82,health:92,stress:24,level:1,recognition:11},org:{funds:42000,volunteers:136,staff:0,credibility:52,media:18,legal:8},support:22,general:5,followers:14300,operationProgress:18};renderGame=()=>{};ensureState();startProject('campus');`,context);
 let state=vm.runInContext('state',context);
@@ -52,6 +53,25 @@ assert.throws(()=>vm.runInContext(`buildCitizenProfile({name:'Bad',age:28,trait:
 assert.notEqual(vm.runInContext('TRAIT_SKILLS.analyst.communication',context),vm.runInContext('TRAIT_SKILLS.speaker.communication',context));
 vm.runInContext(`state.date='2026-05-14';`,context);
 assert.equal(vm.runInContext('sceneArchiveHTML().includes("An education minister resigns")',context),false,'future source records must not spoil the player timeline');
-console.log('Browser profile, campaign and historical dispatch checks passed.');
+const shared=require('../src/shared/campaign-rules.js');
+const caseInput={focus:'mobilise',skill:60,prepared:3,crowdSafety:true,fatigue:12};
+const nodeResult=shared.resolveFieldDay(caseInput);
+const browserResult=vm.runInContext('RepublicCampaignRules.resolveFieldDay('+JSON.stringify(caseInput)+')',context);
+assert.equal(JSON.stringify(browserResult),JSON.stringify(nodeResult),'browser and core must use the same campaign rules');
+const worldFactory=require('../dist/src/core/world.js');
+const coreCampaign=require('../dist/src/game/campaign-2026.js');
+const parity=worldFactory.createNewGame({name:'Parity',age:28,homeState:'Kerala',profession:'Teacher',trait:'organiser'});
+parity.date='2026-06-06';parity.flags.first_response='organise';
+parity.organisation.finance.organisationCash=50000;
+for(const task of ['water','security','permissions'])parity.flags['jantar_'+task]=50;
+coreCampaign.organiseProtestDay(parity,'mobilise');
+vm.runInContext(`state.date='2026-06-06';state.flags.firstResponse='Organise';state.jantarTasks={water:true,security:true,permissions:true};state.jantarCampaign={days:0,crowdTrust:38,studentTrust:35,evidenceQuality:20,legalPressure:0,fatigue:0,offers:0};state.player.skills={...TRAIT_SKILLS.organiser};state.org.funds=50000;state.org.volunteers=0;runCampaignDay('mobilise');`,context);
+const browser=vm.runInContext('state',context);
+assert.equal(browser.org.funds,parity.organisation.finance.organisationCash);
+assert.equal(browser.org.volunteers,parity.organisation.volunteers);
+assert.equal(browser.jantarCampaign.crowdTrust,parity.campaign2026.crowdTrust);
+assert.equal(browser.jantarCampaign.legalPressure,parity.campaign2026.legalPressure);
+console.log('Browser and core campaign parity checks passed.');
+
 
 

@@ -6,10 +6,12 @@
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
+    "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": ["src/core/**/*.ts", "src/content/**/*.ts", "src/game/**/*.ts"]
+  "include": ["src/core/**/*.ts", "src/content/**/*.ts", "src/game/**/*.ts", "src/shared/**/*.js", "src/shared/**/*.d.ts"]
 }
+

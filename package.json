@@ -5,7 +5,7 @@
   "description": "Simulation and content core for REPUBLIC: 543",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
-    "build:core": "tsc -p tsconfig.core.json",
+    "build:core": "tsc -p tsconfig.core.json && node scripts/copy-shared.cjs",
     "validate:data": "node scripts/validate-reality-data.cjs",
     "test:core": "npm run build:core && node scripts/smoke-test.cjs && npm run validate:data",
     "test:browser": "node scripts/test-browser.cjs"
@@ -14,3 +14,4 @@
     "typescript": "^5.8.3"
   }
 }
+
