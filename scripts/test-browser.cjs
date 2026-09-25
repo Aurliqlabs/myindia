@@ -5,6 +5,7 @@ const source=fs.readFileSync('game.js','utf8').replace(/init\(\);\s*$/,'');
 const saved={};
 const context={console,Date,Math,Intl,localStorage:{setItem:(key,value)=>{saved[key]=value;}},document:{querySelector:()=>({textContent:'',innerHTML:'',style:{},classList:{add(){},remove(){}}})},setTimeout:()=>0,clearTimeout:()=>{}};
 vm.createContext(context);
+vm.runInContext(fs.readFileSync('data/reality/historical-scenes.js','utf8'),context);
 vm.runInContext(source,context);
 vm.runInContext(`state={date:'2026-06-06',day:1,phase:'movement',player:{name:'Test',energy:82,health:92,stress:24,level:1,recognition:11},org:{funds:42000,volunteers:136,staff:0,credibility:52,media:18,legal:8},support:22,general:5,followers:14300,operationProgress:18};renderGame=()=>{};ensureState();startProject('campus');`,context);
 let state=vm.runInContext('state',context);
@@ -27,4 +28,8 @@ assert.equal(Object.values(result.byState).reduce((n,x)=>n+x.won,0),result.seats
 assert.ok(result.byState.Kerala.strength>JSON.parse(before).byState.Kerala.strength);
 vm.runInContext(`state.phase='government';state.org.funds=500000;performAction('services');`,context);
 assert.equal(vm.runInContext('state.governance.publicServices',context),52);
-console.log('Browser simulation checks passed.');
+vm.runInContext(`state.date='2026-06-20';state.day=15;advanceDay();`,context);
+state=vm.runInContext('state',context);
+assert.ok(state.pendingScenes.includes('neet-reexam-2026'));
+assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.date<=REALITY_CUTOFF)',context),true);
+console.log('Browser simulation and historical dispatch checks passed.');
