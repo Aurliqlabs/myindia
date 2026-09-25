@@ -1,6 +1,6 @@
 # REPUBLIC: 543
 
-A political career simulation that begins inside the real Cockroach Janta Party story. The reported timeline through 25 September 2026 is locked. On 26 September, the player enters as a **fictional organiser**; all subsequent actions and outcomes are alternate history.
+A political career simulation that begins inside the real Cockroach Janta Party story. The reported timeline through 25 September 2026 is locked. On 26 September, the player enters as a **fictional organiser**; all subsequent actions and outcomes are alternate history. The first decision follows CJP’s unresolved 24 September Election Commission ultimatum.
 
 ## Play
 

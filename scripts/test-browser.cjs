@@ -37,6 +37,8 @@ assert.ok(vm.runInContext('REAL_SCENES.length',context)>=18);
 assert.equal(vm.runInContext('REAL_SCENES.every(x=>x.archive)',context),true);
 assert.ok(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-eci-demand" && x.date==="2026-09-24")',context));
 vm.runInContext(`state.date='2026-09-26';state.org.funds=0;`,context);
+assert.equal(vm.runInContext('nextDecision().id',context),'handoff-eci');
+vm.runInContext(`state.flags.handoffResolved=true;`,context);
 assert.equal(vm.runInContext('nextDecision().title',context),'The payroll cliff');
 vm.runInContext(`state.org.funds=100000;state.org.legal=60;`,context);
 assert.equal(vm.runInContext('nextDecision().title',context),'Legal questions reach the office');
