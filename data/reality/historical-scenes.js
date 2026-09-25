@@ -1,6 +1,13 @@
 /* Verified public events through 25 September 2026. Player responses are fictional. */
 const REAL_SCENES = Object.freeze([
   {
+    id:"court-clarification",date:"2026-05-25",region:"New Delhi",title:"The viral remark and the clarification",
+    fact:"Reporting describes how the May 15 courtroom remark was widely read as disparaging young people. The Chief Justice subsequently said his criticism concerned people using bogus qualifications in professions, not India's youth. The interpretations remain distinct.",
+    scene:"Your group chat shares a clipped quote. A friend forwards the clarification. You can put both before volunteers without deciding what they must believe.",
+    source:"The Indian Express",url:"https://indianexpress.com/article/legal-news/cji-plea-cockroach-janta-party-campaign-sentimental-10706687/",status:"DISPUTED",publishedOn:"2026-05-25",classification:"REPORTED_REMARK_AND_CLARIFICATION"
+  },
+
+  {
     id:"cjp-founded",date:"2026-05-16",region:"Maharashtra",title:"Cockroach Janta Party takes shape",
     fact:"After a Supreme Court hearing drew criticism, Abhijeet Dipke launched CJP as a satirical online movement on 16 May 2026.",scene:"A name born online becomes a sign-up form. Nobody yet knows whether it can survive outside a screen.",
     source:"Indian Express",url:"https://indianexpress.com/article/india/cjp-protest-timeline-five-key-moments-dharmendra-pradhan-resignation-10803274/",status:"REPORTED",archive:true
