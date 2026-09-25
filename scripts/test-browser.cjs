@@ -36,5 +36,15 @@ assert.equal(state.date,'2026-06-06');
 assert.ok(state.pendingScenes.includes('cjp-jantar'));
 assert.equal(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-jantar"&&!x.archive&&x.choices.length===3)',context),true);
 assert.equal(vm.runInContext('REAL_SCENES.every((x,i,a)=>i===0||a[i-1].date<=x.date)',context),true);
-console.log('Browser simulation and playable historical dispatch checks passed.');
+vm.runInContext(`state.date='2026-06-06';state.flags.firstResponse='Help students organise';state.player.trait='organiser';state.player.skills={...TRAIT_SKILLS.organiser};state.player.jobStanding=75;state.org.funds=50000;state.jantarTasks={water:true,security:true,permissions:true};state.jantarCampaign={days:0,crowdTrust:38,studentTrust:35,evidenceQuality:20,legalPressure:0,fatigue:0,offers:0};runCampaignDay('mobilise');`,context);
+state=vm.runInContext('state',context);
+assert.ok(state.jantarCampaign.crowdTrust>38 && state.org.funds===43500,'prepared mobilisation must improve crowd trust and spend cash');
+assert.ok(state.player.jobStanding<75,'fieldwork must cost job standing');
+assert.throws(()=>vm.runInContext("runCampaignDay('mobilise')",context),/already made/);
+vm.runInContext(`state.jantarCampaign={days:0,crowdTrust:38,studentTrust:35,evidenceQuality:20,legalPressure:0,fatigue:0,offers:0};state.jantarTasks={};runCampaignDay('mobilise');`,context);
+assert.ok(vm.runInContext('state.jantarCampaign.crowdTrust<38 && state.jantarCampaign.legalPressure>0',context),'unsafe mobilisation must lower trust');
+vm.runInContext(`state.date='2026-07-21';chooseNegotiation('exam_reform',true,false);`,context);
+assert.equal(vm.runInContext('state.jantarCampaign.negotiation.demand',context),'exam_reform');
+console.log('Browser campaign and historical dispatch checks passed.');
+
 
