@@ -60,5 +60,21 @@ audit.recordSchoolResponse(school,admitted.id,'acknowledged','Fictional authorit
 audit.reviewSchoolAudit(school,admitted.id,'friend_asha');
 ok(audit.publishSchoolAudit(school,admitted.id)==='VERIFIED','corroborated and acknowledged simulated case may be verified');
 ok(core.deserializeWorld(core.serializeWorld(school)).schoolAudits[admitted.id].status==='VERIFIED','school audit must survive save round-trip');
+const citizen=core.createNewGame({name:'Worker',age:27,homeState:'Kerala',profession:'Private-sector employee',trait:'organiser',monthlyIncome:44000,personalSavings:1000,monthlyLivingCosts:23000});
+core.planPersonalDay(citizen,'movement');
+let workReport=core.advanceOneDay(citizen);
+ok(citizen.player.jobStanding<75&&citizen.life.missedWorkDays===1,'movement meeting must cost a work shift');
+core.planPersonalDay(citizen,'delegate','friend_asha');
+workReport=core.advanceOneDay(citizen);
+ok(citizen.life.attendedWorkDays===1&&citizen.relationships.some(x=>x.actorB==='friend_asha'&&x.trust>50),'delegation must protect work and build trust');
+let duplicate=false;core.planPersonalDay(citizen,'rest');try{core.planPersonalDay(citizen,'movement');}catch(e){duplicate=true;}ok(duplicate,'one personal commitment per day');
+const baseCash=citizen.player.personalCash;
+let monthReport;while(citizen.date<='2026-05-31')monthReport=core.advanceOneDay(citizen);
+ok(citizen.player.personalCash>=0&&citizen.life.personalDebt>=0,'personal finances must settle without negative cash');
+ok(monthReport.notes.some(n=>n.includes('Personal salary')),'month-end salary and living costs must be reported');
+ok(citizen.player.personalCash!==baseCash||citizen.life.personalDebt>0,'personal finances must change after month end');
+const legacy=JSON.parse(core.serializeWorld(citizen));delete legacy.life;delete legacy.player.monthlyIncome;
+ok(core.deserializeWorld(JSON.stringify(legacy)).life&&core.deserializeWorld(JSON.stringify(legacy)).player.monthlyIncome===35000,'old saves must hydrate new personal fields');
 console.log('REPUBLIC: 543 core smoke tests passed');
+
 

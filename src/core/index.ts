@@ -11,3 +11,6 @@ export * from "./future";
 export * from "./save";
 export * from "./commands";
 export * from "./events";
+
+export * from "./personal-life";
+

@@ -64,10 +64,12 @@ export interface WorldState {
   scheduledEvents:ScheduledEvent[]; completedEventIds:Id[]; flags:Record<string,boolean|number|string>;
   campaign2026?:import("../game/campaign-2026").Campaign2026State;
   schoolAudits?:Record<Id,import("../game/school-audit").SchoolAuditCase>;
+  life?:import("./personal-life").PersonalLifeState;
 }
 export interface NewGameOptions { name:string; age:number; homeState:string; profession:string; trait:TraitId; seed?:number; snapshotDate?:string; gender?:string; homeDistrict?:string; education?:string; familyBackground?:string; monthlyIncome?:number; personalSavings?:number; monthlyLivingCosts?:number; skillPoints?:Partial<Record<SkillKey,number>>; }
 export interface DailyReport {
   date:string; payroll?:{due:number;paid:number;shortfall:number}; operationUpdates:Array<{id:Id;progressDelta:number;completed:boolean}>;
   secretExposureChecks:Array<{id:Id;exposed:boolean;roll:number;threshold:number}>; triggeredEvents:ScheduledEvent[]; notes:string[];
 }
+
 
