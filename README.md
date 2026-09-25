@@ -16,7 +16,7 @@ Open `index.html` in a browser. Saves stay in that browser. For a local developm
 - Respond to an election result through government or opposition decisions.
 - Export and import a JSON career save.
 
-Historical dispatches through 25 September 2026 link to official sources. The May 2026 assembly results, June NEET re-examination and July–August Monsoon Session are immutable context; the player’s movement and response choices are fictional. Election outcomes, the movement, its characters and other unsourced events are fictional. The browser gameplay is currently separate from the TypeScript simulation core under `src/core`; integrating them is the next architecture milestone.
+Historical dispatches through 25 September 2026 link to official sources. The May 2026 assembly results, June NEET re-examination and July–August Monsoon Session are immutable context; the player’s movement and response choices are fictional. After that date, conditional simulated events react to finances, legal exposure, fatigue and the election outcome. Election outcomes, the movement, its characters and other unsourced events are fictional. The browser gameplay is currently separate from the TypeScript simulation core under `src/core`; integrating them is the next architecture milestone.
 
 ## Verification
 
