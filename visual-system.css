@@ -197,3 +197,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .jantar-panel .choice{display:flex;align-items:center;min-height:52px;padding:10px 13px;font-size:13px;font-weight:650;line-height:1.25;text-align:left;text-transform:capitalize;color:var(--ink);overflow-wrap:anywhere}
 .jantar-panel .choice:disabled{background:#303735;color:#c9d4c7;opacity:.75;border-color:#67776a}
 @media(max-width:480px){.jantar-panel .choices{grid-template-columns:repeat(2,minmax(0,1fr))}.jantar-panel .choice{font-size:12px;padding:9px;min-width:0}}
+
+/* Motion is intentionally paused until the interaction direction is chosen. */
+*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.nav-btn:hover,.dispatch-action:hover:not(:disabled),.primary-brush:hover:not(:disabled),.secondary-brush:hover:not(:disabled),.management-actions button:hover:not(:disabled),.project-card button:hover:not(:disabled),.historical-alert button:hover:not(:disabled),.archive-action:hover:not(:disabled),.action-btn:hover,.choice:hover,.trait:hover,button:active:not(:disabled){transform:none!important}
