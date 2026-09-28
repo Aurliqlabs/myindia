@@ -321,7 +321,7 @@ vm.runInContext(`state.ending=null;state.org.legal=100;checkEndings();`,context)
 assert.equal(vm.runInContext('state.ending.id',context),'arrested','unchecked legal pressure ends the story');
 
 // The weekly routine runs upkeep by itself and stops for anything that needs the player.
-vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-10-05';state.pendingScenes=[];completeHandoff('Bot','Watch','civic');state.org.funds=50000;state.player.energy=90;state.routine={fundraise:2,rest:1,tours:0};var realSpawn2=spawnInjustice;spawnInjustice=()=>{};var d0=state.day,gifts=state.donations.length;advanceWithRoutine(7);spawnInjustice=realSpawn2;`,context);
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-10-05';state.pendingScenes=[];completeHandoff('Bot','Watch','civic');state.org.funds=50000;state.player.energy=90;state.routine={fundraise:2,rest:1,tours:0};state.pendingTip={rivalId:'oberoi',offeredOn:'2026-01-01'};var realSpawn2=spawnInjustice;spawnInjustice=()=>{};var d0=state.day,gifts=state.donations.length;advanceWithRoutine(7);spawnInjustice=realSpawn2;`,context);
 assert.equal(vm.runInContext('state.day-d0',context),7,'a quiet week runs all seven days');
 assert.equal(vm.runInContext('state.donations.length-gifts',context),2,'the routine runs the chosen donor drives');
 assert.ok(vm.runInContext('state.history.some(h=>h.title==="Routine")',context),'the week is summarised in one log entry');
