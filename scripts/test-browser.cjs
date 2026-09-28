@@ -100,6 +100,10 @@ state=vm.runInContext('state',context);
 assert.equal(state.elections[0].seats,0,'low-support party must be able to lose all seats');
 assert.equal(state.phase,'party','zero seats must not unlock parliamentary opposition actions');
 assert.ok(vm.runInContext('careerObjectiveHTML()',context).includes('Rebuild after election night'),'a losing career needs a clear next objective');
+vm.runInContext(`state.pendingScenes=[];state.pendingCrisis=null;state.pendingTip={rivalId:'test',offeredOn:'2026-09-30'};state.phase='party';state.date='2026-10-02';const beforeWaitDay=state.day;waitForDispatch();`,context);
+state=vm.runInContext('state',context);
+assert.equal(state.date,'2026-11-01','future waiting may cover a month when no new alert arrives');
+assert.equal(state.day-vm.runInContext('beforeWaitDay',context),30,'future wait must still process each calendar day');
 console.log('Browser campaign, audit, timeline and election checks passed.');
 
 
