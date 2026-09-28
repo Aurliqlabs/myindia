@@ -338,7 +338,7 @@ assert.equal(vm.runInContext(`needsConfirmation('people',{action:'release'})`,co
 assert.equal(vm.runInContext(`needsConfirmation('go',{page:'home'})||needsConfirmation('pick',{})||needsConfirmation('talk',{})`,context),false);
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'advance-week'})`,context),true,'time advancement is a consequential confirmation');
 vm.runInContext(`state.settings={confirm:false};`,context);
-assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),true,'consequential actions always confirm');
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),false,'the setting turns confirmations off');
 vm.runInContext(`state.settings={};`,context);
 // Stale historical dispatches close themselves after three weeks instead of piling up.
 vm.runInContext(`state.date='2026-09-01';state.pendingScenes=['cjp-pressure-group','cjp-eci-demand'];expireStaleScenes();`,context);
