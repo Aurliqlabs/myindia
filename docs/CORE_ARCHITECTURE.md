@@ -26,7 +26,14 @@ The simulation core is independent from the UI. Browser/mobile clients issue com
 - recruitment with incomplete information: candidates carry hidden true stats and expose only qualitative interview impressions (`recruitment.ts`)
 - human-readable relationship/wellbeing signals that never expose raw hidden numbers (`signals.ts`)
 
-All of the above is deterministic: every random branch consumes the same seeded `Rng` the rest of the engine already uses. None of it is wired into `game.js` yet — the browser client still runs its own separate implementation (see "Next systems" in the README).
+All of the above is deterministic: every random branch consumes the same seeded `Rng` the rest of the engine already uses.
+
+## Connected to the browser in V0.5
+
+- `src/game/browser-bridge.ts` is the browser's only entry point. `npm run build:engine` bundles it and everything it imports into `engine/republic-engine.js` (global `RepublicEngine`).
+- `game.js` keeps one `GameEngine` store. The engine `WorldState` lives at `state.world` and is saved, exported and imported with the rest of the game.
+- The engine owns people (psychology, burnout, memory, relationships, careers, recruitment, payroll responses), voter-group opinion and the seat-by-seat election model. The browser owns the dated timeline, campaign actions and organisation metrics, which it mirrors into the world before each engine step.
+- Still browser-only: school audits, hidden donations, rival exposés and personal-life day planning.
 
 ## Data layers
 

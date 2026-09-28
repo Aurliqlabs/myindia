@@ -292,3 +292,32 @@ button:active:not(:disabled){filter:brightness(.9)}
 .handoff-form input:focus-visible,.handoff-form select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .handoff-form .dispatch-action{justify-self:start}
 .chapter-goal{color:#f1ce84!important;font-weight:700}
+
+/* Engine-backed team, route desks and the 29 September handoff */
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin-top:16px}
+.staff-card{display:flex;flex-direction:column;gap:8px;padding:14px;background:#292d2f;border:1px solid var(--line);border-radius:4px;min-width:0}
+.staff-head{display:flex;align-items:center;gap:10px}.staff-head .portrait{width:40px;height:40px;flex:none;display:grid;place-items:center;font-weight:700}
+.staff-head strong{display:block;color:var(--ink)}.staff-head small{color:var(--muted);font-size:12px}
+.staff-card>p{margin:0;font-size:13px}
+.signal-list{margin:0;padding-left:18px;color:#d0cec6;font-size:13px;line-height:1.45}.signal-list .concern{color:var(--orange)}
+.staff-request{color:var(--gold)!important;font-weight:600}
+.staff-memory{font-size:12px;color:var(--muted)!important;font-style:italic}
+.staff-card .management-actions{margin-top:auto}
+.person-signal{display:block;margin-top:2px;font-size:11px;color:#9fa39c}
+.status-dot.available,.status-dot.former{background:#6b6f6b}.status-dot.on_leave{background:var(--orange)}
+.effect-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.effect-chips i{font-style:normal;font-size:11px;font-weight:650;padding:1px 6px;border-radius:var(--radius-tag);background:#1f2a24;color:var(--green)}
+.effect-chips i.down{background:#35211f;color:#f0a39c}
+.scene-sources{display:flex;flex-wrap:wrap;gap:4px 14px}
+.handoff-form{max-width:760px}
+.handoff-identity{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.handoff-identity label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.handoff-identity input{padding:10px;border:1px solid var(--line);background:#1d2022;color:var(--ink);border-radius:3px;font-size:15px}
+.route-options{border:0;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.route-options legend{font-size:12px;color:var(--muted);margin-bottom:8px}
+.route-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:16px;border:1px solid var(--line);border-radius:4px;background:#292d2f;cursor:pointer}
+.route-card input{position:absolute;opacity:0;pointer-events:none}
+.route-card:has(input:checked){border-color:var(--gold);background:#33302a;box-shadow:inset 0 0 0 1px var(--gold)}
+.route-card:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.route-title{font-size:18px;font-weight:750;color:var(--ink)}.route-lede{font-size:13px;color:#d0cec6}
+.route-card ul{margin:2px 0 0;padding-left:18px;font-size:13px;color:var(--ink)}.route-card small{color:var(--gold)}

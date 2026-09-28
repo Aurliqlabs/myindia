@@ -7,14 +7,16 @@ const context={console,Date,Math,Intl,localStorage:{setItem:(key,value)=>{saved[
 vm.createContext(context);
 vm.runInContext(fs.readFileSync('data/reality/historical-scenes.js','utf8'),context);
 vm.runInContext(fs.readFileSync('src/shared/campaign-rules.js','utf8'),context);
-vm.runInContext(fs.readFileSync('src/shared/people-rules.js','utf8'),context);
+vm.runInContext(fs.readFileSync('engine/republic-engine.js','utf8'),context);
 vm.runInContext(source,context);
 vm.runInContext(`renderIntro=()=>{};show=()=>{};renderGame=()=>{};startHistoricalGame();`,context);
 assert.equal(vm.runInContext('state.player.name',context),'Abhijeet Dipke');
 assert.equal(vm.runInContext('state.historicalRoleplay',context),true);
 vm.runInContext(`state.flags.firstResponse='Help students organise';waitForDispatch();`,context);
-assert.equal(vm.runInContext('state.date',context),'2026-05-16','timeline stops for the first dated movement event');
-assert.ok(vm.runInContext('state.pendingScenes.includes("cjp-founded")',context));
+assert.equal(vm.runInContext('state.date',context),'2026-05-15','timeline stops at the first dated dispatch');
+assert.ok(vm.runInContext('state.pendingScenes.includes("exam-remark")',context));
+assert.equal(vm.runInContext('REAL_SCENES.find(x=>x.id==="exam-remark").sources.length',context),2,'the 15 May dispatch cites both reports');
+assert.ok(vm.runInContext('REAL_SCENES.every(x=>x.sources.length&&x.sources.every(s=>s.name&&/^https:\\/\\//.test(s.url))&&x.status)',context),'every dispatch has a status and linked sources');
 assert.ok(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-campus-safety"&&x.date==="2026-09-28")',context));
 vm.runInContext(`state.date='2026-09-28';state.pendingScenes=[];waitForDispatch();`,context);
 assert.equal(vm.runInContext('state.date',context),'2026-09-29','historical progression stops at the player handoff');
@@ -37,10 +39,17 @@ let state=vm.runInContext('state',context);
 assert.equal(state.day,2);
 assert.equal(state.org.volunteers,166);
 assert.equal(state.projects[0].status,'completed');
-vm.runInContext(`performAction('hire');`,context);
+// People now live in the TypeScript engine world inside the same state tree.
+assert.ok(vm.runInContext('state.world&&state.world.schemaVersion===1',context),'every game carries an engine world');
+assert.equal(vm.runInContext('team().filter(x=>x.founding&&x.status==="available").length',context),4,'four founding friends can be invited');
+vm.runInContext(`peopleAction('hire','friend_asha');`,context);
 state=vm.runInContext('state',context);
-assert.equal(state.org.monthlyBurn,21100);
-assert.ok(saved['republic543-save']);
+assert.equal(state.world.characters.friend_asha.employed,true);
+assert.equal(state.world.characters.friend_asha.roleId,'legal_lead','a hire takes the best-fit role');
+assert.equal(vm.runInContext('GameEngine.api().payrollDue(state.world)',context),15000);
+assert.equal(vm.runInContext('monthlyCosts()',context),6100+15000,'salaries join operating costs');
+assert.ok(vm.runInContext('team().find(x=>x.id==="friend_asha").signals.length>0',context),'colleagues are described by signals, not raw numbers');
+assert.ok(saved['republic543-save'].includes('friend_asha'),'the saved tree includes the engine world');
 vm.runInContext(`state.phase='party';state.org.funds=500000;state.org.volunteers=600;state.org.credibility=70;state.player.energy=80;state.support=40;state.general=20;state.targetState='Kerala';`,context);
 const before=JSON.stringify(vm.runInContext('simulateElection()',context));
 assert.equal(JSON.stringify(vm.runInContext('simulateElection()',context)),before,'same save must yield same election');
@@ -132,4 +141,92 @@ const peopleRules=require('../src/shared/people-rules.js');
 let wellbeing={energy:8,stress:55,morale:70,employed:true};let leave;
 for(let day=14;day<21&&!leave;day++){const next=peopleRules.dailyWellbeing(wellbeing,`2026-05-${day}`,()=>.5);wellbeing={...wellbeing,...next};if(next.forcedLeave)leave=next.onLeaveUntil;}
 assert.ok(leave,'shared staff wellbeing must trigger leave after sustained exhaustion');
-console.log('Browser campaign, audit, timeline, election and staff checks passed.');
+
+// GameEngine store: fresh historical game → full save tree round-trip, including engine world state.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Help students organise';state.org.funds=90000;peopleAction('hire','friend_meera');peopleAction('recognise','friend_meera');`,context);
+const beforeSave=JSON.parse(saved['republic543-save']);
+assert.equal(beforeSave.saveVersion,3);
+assert.ok(beforeSave.world.memories.some(m=>m.characterId==='friend_meera'&&m.type==='founding_recognition'),'engine memories are saved');
+vm.runInContext(`state={};GameEngine.load(${JSON.stringify(saved['republic543-save'])});`,context);
+assert.equal(vm.runInContext('state.world.characters.friend_meera.employed',context),true,'engine state survives a reload');
+const idCounter=vm.runInContext('state.world.idCounter',context);
+vm.runInContext(`peopleAction('defend','friend_meera');`,context);
+assert.ok(vm.runInContext('state.world.idCounter',context)>idCounter,'reloaded worlds keep issuing unique ids');
+assert.throws(()=>vm.runInContext(`peopleAction('recognise','friend_meera')`,context),/already been recognised/);
+vm.runInContext(`GameEngine.load(GameEngine.exportData());`,context);
+assert.equal(vm.runInContext('state.world.characters.friend_meera.foundingMember',context),true,'export wrapper imports cleanly');
+
+// Saves made before the engine was connected: paid template advisers become engine colleagues.
+vm.runInContext(`GameEngine.load({date:'2026-07-01',day:49,phase:'movement',player:{name:'Old',trait:'organiser',energy:70,stress:30,health:90,level:7,recognition:3,money:1000},org:{name:'CJP',funds:40000,volunteers:90,staff:2,credibility:50,media:5,legal:3,monthlyBurn:36100},support:25,general:5,followers:100,advisers:[{name:'Aditi Rao',role:'Movement Lead',energy:60,loyalty:70,stress:20,morale:65},{name:'Imran Khan',role:'Strategy',energy:40,loyalty:30},{name:'Kavya Menon',role:'Media',energy:78,loyalty:62}]});`,context);
+state=vm.runInContext('state',context);
+assert.equal(state.advisers,undefined);
+assert.equal(state.org.monthlyBurn,6100,'adviser salaries move from fixed costs to engine payroll');
+assert.equal(vm.runInContext('GameEngine.api().payrollDue(state.world)',context),30000);
+assert.equal(vm.runInContext('JSON.stringify(team().filter(x=>x.status==="paid").map(x=>x.name))',context),'["Aditi Rao","Imran Khan"]');
+
+// Month end: salaries come out of what is left; a shortfall hits each unpaid colleague individually.
+vm.runInContext(`state.date='2026-07-31';state.org.funds=10000;state.pendingScenes=[];advanceDay();`,context);
+state=vm.runInContext('state',context);
+assert.equal(state.org.funds,0,'operating costs and salaries drain available cash');
+assert.ok(state.history.some(h=>h.title==='Staff payroll shortfall'),'payroll shortfall is reported');
+assert.ok(state.world.characters.adviser_1.unpaidStreak>=1||state.world.characters.adviser_1.volunteer||!state.world.characters.adviser_1.employed,'each colleague responds to missed pay');
+
+// Dispatch choices reach team morale through the engine.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.org.funds=50000;peopleAction('volunteer','friend_rohan');state.date='2026-07-25';state.pendingScenes=['cjp-minister'];`,context);
+const moraleBefore=vm.runInContext('state.world.characters.friend_rohan.morale',context);
+vm.runInContext(`applyEffect(REAL_SCENES.find(x=>x.id==='cjp-minister').choices[1].effect,'Thanked the volunteers.');`,context);
+assert.equal(vm.runInContext('state.world.characters.friend_rohan.morale',context),Math.min(100,moraleBefore+6),'thanking volunteers lifts team morale');
+assert.ok(vm.runInContext(`effectChips({funds:-3000,morale:6,legal:2})`,context).includes('Team morale +6'),'choices preview their consequences');
+
+// 29 September handoff opens once, then each route unlocks its own desk.
+vm.runInContext(`state.date='2026-09-28';state.pendingScenes=[];state.flags.firstResponse='Organise';advanceDay();`,context);
+assert.equal(vm.runInContext('state.date',context),'2026-09-29');
+assert.equal(vm.runInContext('state.pendingHandoff',context),true,'the handoff is queued on 29 September');
+assert.ok(vm.runInContext('HANDOFF_ROUTES.map(r=>r.id).join()',context)==='civic,electoral');
+vm.runInContext(`completeHandoff('Abhijeet Dipke','Cockroach Janta Party','civic');state.org.funds=200000;`,context);
+assert.equal(vm.runInContext('state.player.name',context),'Abhijeet Dipke','players may keep the historical name');
+assert.equal(vm.runInContext('routeOpen("civic")&&!routeOpen("electoral")',context),true);
+assert.throws(()=>vm.runInContext(`electoralAction('ad')`,context),/electoral route/);
+assert.throws(()=>vm.runInContext(`suitAction('file')`,context),/documented evidence/,'a petition needs a documented basis');
+vm.runInContext(`rtiAction('file','school-repairs');`,context);
+assert.throws(()=>vm.runInContext(`rtiAction('file','school-repairs')`,context),/already pending/);
+const rtiDue=vm.runInContext('state.rtiRequests[0].dueOn',context);
+vm.runInContext(`while(state.date<'${rtiDue}')advanceDay();`,context);
+let rti=vm.runInContext('state.rtiRequests[0]',context);
+assert.ok(['records','partial','refused'].includes(rti.status),'the RTI reply arrives on its due date');
+if(rti.status==='refused'){vm.runInContext(`rtiAction('appeal','rti-1');{const due=state.rtiRequests[0].dueOn;while(state.date<due)advanceDay();}`,context);rti=vm.runInContext('state.rtiRequests[0]',context);assert.ok(['records','closed'].includes(rti.status));}
+if(['records','partial'].includes(rti.status)){
+ const cases=vm.runInContext('majorCivicCases()',context);
+ vm.runInContext(`rtiAction('publish','rti-1');suitAction('file');`,context);
+ assert.equal(vm.runInContext('majorCivicCases()',context),cases+1,'a published RTI report is a major civic case');
+ const hearing=vm.runInContext('state.legalSuits[0].hearingOn',context);
+ vm.runInContext(`while(state.date<'${hearing}')advanceDay();`,context);
+ assert.ok(['notice','dismissed'].includes(vm.runInContext('state.legalSuits[0].status',context)),'the court rules on the hearing date');
+}
+// A well-drafted request is answered in full; the report and a petition built on it both follow.
+vm.runInContext(`state.player.energy=80;rtiAction('file','water-tests');state.rtiRequests[0].quality=100;{const due=state.rtiRequests[0].dueOn;while(state.date<due)advanceDay();}`,context);
+assert.equal(vm.runInContext('state.rtiRequests[0].status',context),'records');
+const casesBefore=vm.runInContext('majorCivicCases()',context);
+vm.runInContext(`rtiAction('publish',state.rtiRequests[0].id);`,context);
+assert.equal(vm.runInContext('majorCivicCases()',context),casesBefore+1,'a published RTI report is a major civic case');
+assert.throws(()=>vm.runInContext(`rtiAction('publish',state.rtiRequests[0].id)`,context),/nothing new/);
+vm.runInContext(`suitAction('file');`,context);
+assert.throws(()=>vm.runInContext(`suitAction('file')`,context),/pending hearing/);
+vm.runInContext(`state.legalSuits[0].strength=100;{const hearing=state.legalSuits[0].hearingOn;while(state.date<hearing)advanceDay();}`,context);
+assert.equal(vm.runInContext('state.legalSuits[0].status',context),'notice','a strong petition draws notice on its hearing date');
+assert.equal(vm.runInContext('majorCivicCases()',context),casesBefore+2);
+// Switching route opens the electoral desk: voter groups, ads and candidates feed the engine election.
+vm.runInContext(`performAction('switch-route');state.org.funds=500000;state.player.energy=80;state.targetSegment='students';`,context);
+const students=vm.runInContext('state.world.publicOpinion.students',context);
+vm.runInContext(`electoralAction('ad');`,context);
+assert.ok(vm.runInContext('state.world.publicOpinion.students',context)>students,'a targeted ad moves its voter group');
+assert.throws(()=>vm.runInContext(`electoralAction('candidates')`,context),/Found the party/);
+vm.runInContext(`state.phase='party';state.targetState='Kerala';electoralAction('candidates');`,context);
+assert.equal(vm.runInContext('state.candidates.Kerala.seats',context),20);
+vm.runInContext(`state.campaign.preparation=40;state.support=30;state.general=15;state.org.presence.Kerala=60;`,context);
+const withSlate=vm.runInContext('simulateElection()',context);
+vm.runInContext(`state.candidates.Kerala.quality=5;`,context);
+const weakSlate=vm.runInContext('simulateElection()',context);
+assert.ok(withSlate.byState.Kerala.voteShare>weakSlate.byState.Kerala.voteShare,'candidate quality changes the engine result');
+assert.equal(Object.values(withSlate.byState).reduce((n,x)=>n+x.total,0),543);
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff and route checks passed.');

@@ -15,6 +15,7 @@ jobs:
           node-version: '22'
       - run: npm install
       - run: npm run test:core
+      - run: npm run check:engine
       - run: npm run test:browser
       - name: Upload source build
         uses: actions/upload-artifact@v4
@@ -23,6 +24,7 @@ jobs:
           path: |
             index.html
             game.js
+            engine/
             styles.css
             data/
             scripts/
