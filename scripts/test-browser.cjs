@@ -229,4 +229,26 @@ vm.runInContext(`state.candidates.Kerala.quality=5;`,context);
 const weakSlate=vm.runInContext('simulateElection()',context);
 assert.ok(withSlate.byState.Kerala.voteShare>weakSlate.byState.Kerala.voteShare,'candidate quality changes the engine result');
 assert.equal(Object.values(withSlate.byState).reduce((n,x)=>n+x.total,0),543);
-console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff and route checks passed.');
+
+// Balance rules found by scripts/balance-sim.cjs.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-05-20';state.pendingScenes=[];state.org.funds=0;state.player.energy=90;performAction('fundraise');`,context);
+const firstDrive=vm.runInContext('state.donations[0].amount',context);
+vm.runInContext(`state.pendingScenes=[];performAction('fundraise');`,context);
+assert.ok(vm.runInContext('state.donations[0].amount',context)<firstDrive,'back-to-back donor drives raise less');
+assert.equal(vm.runInContext('state.donorFatigue',context),24,'repeated appeals build donor fatigue');
+vm.runInContext(`for(let i=0;i<12;i++)advanceDay();`,context);
+assert.equal(vm.runInContext('state.donorFatigue',context),0,'donors recover after a break');
+vm.runInContext(`state.support=30;performAction('rest');`,context);
+assert.equal(vm.runInContext('state.support',context),30,'resting does not cost national support');
+vm.runInContext(`state.support=80;applyEffect({support:2});state.org.credibility=95;applyEffect({credibility:2});`,context);
+assert.equal(vm.runInContext('state.support',context),80,'support gains flatten near the top');
+assert.equal(vm.runInContext('state.org.credibility',context),95,'credibility gains flatten near the top');
+const beforeCollapse=vm.runInContext('state.day',context);
+vm.runInContext(`state.player.health=14;state.player.energy=5;advanceDay();`,context);
+assert.equal(vm.runInContext('state.day',context)-beforeCollapse,4,'collapse costs three extra days');
+assert.ok(vm.runInContext('state.player.health>30&&state.history.some(h=>h.title==="Collapse")',context));
+vm.runInContext(`state.player.money=1000;state.player.jobStanding=0;state.player.debt=0;settlePersonalMonth();`,context);
+assert.equal(vm.runInContext('state.player.debt',context),21000,'unpaid living costs become personal debt');
+vm.runInContext(`state.player.jobStanding=100;state.player.monthlyIncome=35000;settlePersonalMonth();`,context);
+assert.equal(vm.runInContext('state.player.debt',context),8000,'salary pays debt down first');
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route and balance checks passed.');

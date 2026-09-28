@@ -113,6 +113,8 @@ npm run check:engine   # the committed bundle matches src/
 npm run test:browser   # the browser game with the real engine bundle
 ```
 
+To see how the economy plays out, `npm run sim:balance` runs the real game headlessly for about 18 months with three scripted strategies: a daily grinder, a staff-heavy electoral builder, and a passive player. It prints monthly funds, volunteers, credibility, support and energy, plus when each chapter and election was reached. Run it after changing any costs or rewards.
+
 ## Not yet connected
 
 - School audits in the browser still use their own rules. The engine's evidence-graph audit (`src/game/school-audit.ts`) is not yet used by the Research page.
