@@ -86,6 +86,15 @@ assert.equal(vm.runInContext('state.schoolAudits[0].status',context),'VERIFIED')
 vm.runInContext("schoolAuditAction('open');schoolAuditAction('document','audit-3');schoolAuditAction('request','audit-3');schoolAuditAction('response','audit-3','acknowledged');schoolAuditAction('review','audit-3');",context);
 assert.throws(()=>vm.runInContext("schoolAuditAction('publish','audit-3')",context),/document and witness/);
 assert.ok(saved['republic543-save'].includes('fictionalComposite'));
-console.log('Browser campaign parity and school-audit checks passed.');
+vm.runInContext(`state.date='2026-05-15';state.day=2;state.phase='movement';state.flags.firstResponse='Contact a journalist';state.pendingScenes=[];state.pendingCrisis=null;state.pendingTip=null;state.player.energy=60;state.player.stress=20;waitForDispatch();`,context);
+state=vm.runInContext('state',context);
+assert.equal(state.date,'2026-05-16','waiting must stop at the first historical dispatch');
+assert.ok(state.pendingScenes.length>0,'historical response must remain pending');
+assert.equal(state.player.energy,60,'routine waiting must not drain the player as if they worked every day');
+const blockedDay=state.day;
+vm.runInContext('waitForDispatch()',context);
+assert.equal(vm.runInContext('state.day',context),blockedDay,'waiting must not bypass an unanswered dispatch');
+assert.ok(saved['republic543-save'].includes('pendingScenes'),'waiting must persist the paused state');
+console.log('Browser campaign, audit and timeline checks passed.');
 
 
