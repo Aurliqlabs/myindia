@@ -332,12 +332,13 @@ assert.ok(vm.runInContext('state.lastCaseOn===state.date||state.day-stop===28',c
 vm.runInContext(`state.pendingScenes=['exam-remark'];`,context);
 assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits while a dispatch is unanswered');
 
-// Asking before acting: world-changing clicks ask; navigation, pickers and story buttons do not; players can opt out.
+// Asking before acting: world-changing clicks always ask; navigation, pickers and story buttons do not.
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
 assert.equal(vm.runInContext(`needsConfirmation('people',{action:'release'})`,context),true);
-assert.equal(vm.runInContext(`needsConfirmation('go',{page:'home'})||needsConfirmation('pick',{})||needsConfirmation('act',{act:'advance-week'})||needsConfirmation('talk',{})`,context),false);
+assert.equal(vm.runInContext(`needsConfirmation('go',{page:'home'})||needsConfirmation('pick',{})||needsConfirmation('talk',{})`,context),false);
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'advance-week'})`,context),true,'time advancement is a consequential confirmation');
 vm.runInContext(`state.settings={confirm:false};`,context);
-assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),false,'the setting turns confirmations off');
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),true,'consequential actions always confirm');
 vm.runInContext(`state.settings={};`,context);
 // Stale historical dispatches close themselves after three weeks instead of piling up.
 vm.runInContext(`state.date='2026-09-01';state.pendingScenes=['cjp-pressure-group','cjp-eci-demand'];expireStaleScenes();`,context);

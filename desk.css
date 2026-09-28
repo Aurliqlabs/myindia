@@ -8,14 +8,14 @@
 .desk{
   --d-card:#17191c;--d-card-2:#1d2024;--d-line:rgba(255,255,255,.08);--d-line-2:rgba(255,255,255,.14);
   --d-ink:#f2ede5;--d-muted:#9da2a6;--d-soft:#c9c4bb;--d-gold:#e3bd5c;--d-red:#e0453d;--d-red-soft:rgba(224,69,61,.14);
-  --d-green:#8fc29d;--d-pad:22px;--d-gap:20px;--d-radius:12px;color:var(--d-ink)}
+  --d-green:#8fc29d;--d-pad:22px;--d-gap:20px;--d-radius:14px 3px 14px 3px;--d-radius-sm:9px 2px 9px 2px;color:var(--d-ink)}
 
 /* Heading: title on the left, a calendar tile for the day on the right. */
 .desk .desk-head{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:6px 0 14px}
 .desk .desk-eyebrow{margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--d-gold)}
 .desk .desk-head h1{margin:0;font-size:clamp(28px,3vw,38px);line-height:1;letter-spacing:-.02em;font-weight:800;color:var(--d-ink)}
 .desk .desk-day{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;background:var(--d-card);border:1px solid var(--d-line);border-radius:var(--d-radius)}
-.desk .desk-day b{display:grid;place-items:center;min-width:52px;height:52px;padding:0 8px;border-radius:9px;background:var(--d-red);color:#fff;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.desk .desk-day b{display:grid;place-items:center;min-width:52px;height:52px;padding:0 8px;border-radius:var(--d-radius-sm);background:var(--d-red);color:#fff;font-size:22px;font-weight:800;letter-spacing:-.02em}
 .desk .desk-day span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-muted);line-height:1.5}
 
 /* The journey: where you are in the whole story. */
@@ -54,11 +54,13 @@
 .desk .dispatch-aside{display:none}
 
 /* Buttons */
-.desk .btn,.desk .dispatch-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:1px solid transparent;transform:none!important}
+.desk .btn,.desk .dispatch-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border-radius:var(--d-radius-sm);font-size:14px;font-weight:700;cursor:pointer;border:1px solid transparent;transform:none!important}
 .desk .dispatch-action,.desk .btn.primary{margin-top:4px;background:var(--d-red)!important;color:#fff!important;border-color:var(--d-red)!important}
-.desk .dispatch-action:hover:not(:disabled),.desk .btn.primary:hover:not(:disabled){background:#ea5a52!important}
 .desk .btn.ghost{background:transparent;color:var(--d-ink);border-color:var(--d-line-2)}
 .desk .btn.ghost:hover:not(:disabled){border-color:var(--d-gold);color:var(--d-gold)}
+.desk .btn.primary:not(:disabled),.desk .btn.ghost:not(:disabled){background-image:linear-gradient(90deg,var(--d-gold),var(--d-gold))!important;background-repeat:no-repeat!important;background-size:0% 100%!important;transition:background-size 170ms cubic-bezier(.15,.85,.25,1),color 170ms,border-color 170ms!important}
+.desk .campaign-pulse{display:grid;grid-template-columns:1.1fr 1fr 1.25fr;gap:1px;margin:12px 0;background:rgba(227,189,92,.24);border:1px solid rgba(227,189,92,.28);border-radius:12px 2px 12px 2px;overflow:hidden}.desk .campaign-pulse>div{min-width:0;padding:10px 12px;background:rgba(21,23,25,.96)}.desk .campaign-pulse small,.desk .pulse-live span{display:block;color:var(--d-gold);font-size:9px;font-weight:800;letter-spacing:.1em}.desk .campaign-pulse strong{display:block;margin-top:4px;color:var(--d-ink);font-size:12px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.desk .pulse-live{display:flex;align-items:center;gap:7px}.desk .pulse-live i{width:7px;height:7px;flex:none;border-radius:50%;background:var(--d-red);box-shadow:0 0 0 3px rgba(224,69,61,.13);animation:warning-beacon 1.8s ease-in-out infinite}.desk .pulse-live strong{margin:0}@media(max-width:680px){.desk .campaign-pulse{grid-template-columns:1fr}.desk .campaign-pulse>div{padding:9px 11px}.desk .campaign-pulse strong{white-space:normal}.desk .pulse-live{display:grid;grid-template-columns:auto auto 1fr}}
+.desk .btn.primary:hover:not(:disabled),.desk .btn.ghost:hover:not(:disabled){background-size:100% 100%!important;border-color:var(--d-gold)!important;color:#211b15!important}
 .desk .btn.wide{width:100%;margin-top:12px}
 .desk .btn:disabled,.desk .dispatch-action:disabled{opacity:.4;cursor:not-allowed}
 .desk .btn-pair{display:grid;grid-template-columns:1fr auto;gap:8px}
@@ -77,15 +79,15 @@
 .desk .routine-rows{margin-top:8px}
 .desk .setting-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0}
 .desk .setting-row>span{font-size:13.5px;color:var(--d-soft)}
-.desk .seg{display:inline-flex;padding:3px;background:#0f1113;border:1px solid var(--d-line);border-radius:8px;gap:2px}
-.desk .seg button{min-width:32px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--d-muted);font-weight:700;cursor:pointer}
+.desk .seg{display:inline-flex;padding:3px;background:#0f1113;border:1px solid var(--d-line);border-radius:var(--d-radius-sm);gap:2px}
+.desk .seg button{min-width:32px;height:28px;border:0;border-radius:6px 1px 6px 1px;background:transparent;color:var(--d-muted);font-weight:700;cursor:pointer}
 .desk .seg button:hover{color:var(--d-ink)}.desk .seg button.on{background:var(--d-gold);color:#17140c}
 .desk .quick-list{display:flex;flex-direction:column;margin-top:12px;border-top:1px solid var(--d-line)}
 .desk .quick{display:grid;grid-template-columns:32px minmax(0,1fr) 12px;gap:12px;align-items:center;width:100%;padding:9px 0;background:transparent;border:0;border-bottom:1px solid var(--d-line);color:var(--d-ink);text-align:left;cursor:pointer}
 .desk .quick:last-child{border-bottom:0}
 .desk .quick:hover:not(:disabled) .quick-go,.desk .quick:hover:not(:disabled) strong{color:var(--d-gold)}
 .desk .quick:disabled{opacity:.4;cursor:not-allowed}
-.desk .quick-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--d-card-2);border:1px solid var(--d-line);color:var(--d-gold);font-size:13px}
+.desk .quick-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:8px 2px 8px 2px;background:var(--d-card-2);border:1px solid var(--d-line);color:var(--d-gold);font-size:13px}
 .desk .quick-text strong{display:block;font-size:13.5px;font-weight:650}.desk .quick-text small{display:block;font-size:12px;color:var(--d-muted)}
 .desk .quick-go{font-size:18px;color:var(--d-muted)}
 
@@ -112,7 +114,7 @@
 .desk .live::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--d-red);vertical-align:1px}
 .desk .legal-line{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border-left:2px solid var(--d-red);background:var(--d-red-soft);border-radius:0 8px 8px 0;font-size:13px;color:var(--d-soft)}
 .desk .legal-line b{color:#ff9a93}
-.desk .legal-line button,.desk .outrage-line button{min-height:32px;padding:0 12px;border-radius:8px;background:transparent;color:var(--d-ink);border:1px solid var(--d-line-2);font-size:12.5px;font-weight:700;cursor:pointer}
+.desk .legal-line button,.desk .outrage-line button{min-height:32px;padding:0 12px;border-radius:8px 2px 8px 2px;background:transparent;color:var(--d-ink);border:1px solid var(--d-line-2);font-size:12.5px;font-weight:700;cursor:pointer}
 .desk .legal-line button:hover,.desk .outrage-line button:hover:not(:disabled){border-color:var(--d-gold);color:var(--d-gold)}
 .desk .outrage-line button:disabled{opacity:.35;cursor:not-allowed}
 .desk .outrage-line{display:grid;grid-template-columns:auto minmax(60px,1fr) auto auto auto;gap:10px;align-items:center;margin-bottom:6px}
@@ -154,6 +156,6 @@
 .desk .historical-alert{border-left:3px solid var(--d-gold)!important}
 .desk .historical-alert small{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--d-gold)}
 .desk .historical-alert h3{margin:6px 0;font-size:20px}.desk .historical-alert p{max-width:72ch;color:var(--d-soft)}
-.desk .historical-alert button{min-height:40px;padding:0 18px;border-radius:8px;background:var(--d-gold)!important;color:#17140c!important;border:0;font-weight:700}
+.desk .historical-alert button{min-height:40px;padding:0 18px;border-radius:8px 2px 8px 2px;background:var(--d-gold)!important;color:#17140c!important;border:0;font-weight:700}
 
 @media(max-width:600px){.desk{--d-pad:16px;--d-gap:14px}.desk .desk-day span{display:none}}
