@@ -28,6 +28,7 @@ jobs:
             ui.js
             engine/
             styles.css
+            desk.css
             data/
             scripts/
             src/

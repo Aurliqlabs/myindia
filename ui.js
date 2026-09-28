@@ -100,26 +100,96 @@ function confirmAction(type,p,run){
  modal.querySelector(".confirm-yes").onclick=()=>{if(modal.querySelector(".confirm-skip input").checked){state.settings={...(state.settings||{}),confirm:false};}modal.remove();try{run();}catch(e){toast(e.message);}};
  setTimeout(()=>modal.querySelector(".confirm-yes").focus(),0);
 }
-function renderHud(){const el=document.querySelector("#hud");if(el)el.innerHTML=hudHTML();}
+function renderHud(){const av=document.querySelector("#avatar-mini");if(av&&state.player&&!av.querySelector("svg"))av.innerHTML=portrait(state.player.name,{mood:"high"});const el=document.querySelector("#hud");if(el)el.innerHTML=hudHTML();}
+
+/* ---------- Portraits ---------- */
+/** A flat illustrated portrait drawn from the name, so the same person always looks the same. Expression follows
+ * mood; "villain" gives the network's members a darker dossier look. Nothing about the portrait is inferred from
+ * the name's meaning: every feature is an independent pick from a hash. */
+const SKIN=["#7a4a2a","#8d5524","#a86b3c","#c68642","#d9a066","#e0ac69"];
+const HAIR=["#1b1b1b","#241a14","#3b2a20","#2e2e2e","#4a3526","#6b6b6b"];
+const BACKDROP=["#3b4a5a","#4a3b5a","#5a4a3b","#3b5a4a","#5a3b44","#44505a","#58503a"];
+const SHIRT=["#b8463f","#3f6fb8","#3f9a6f","#c49a3f","#7a4fb0","#d0cabf","#2f3a45"];
+function portrait(name,{mood="steady"}={}){
+ let h=2166136261;for(const ch of String(name)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}h>>>=0;
+ const pick=(arr,shift)=>arr[(h>>>shift)%arr.length],bit=shift=>((h>>>shift)&1)===1;
+ const villain=mood==="villain",skin=pick(SKIN,0),hair=pick(HAIR,3),bg=villain?"#241d20":pick(BACKDROP,6),shirt=villain?"#15171a":pick(SHIRT,9);
+ const style=(h>>>12)%5,glasses=villain?bit(20):(h>>>15)%4===0,moustache=(h>>>17)%3===0;
+ const hairBack=style===1?`<path d="M17 30c0-12 7-19 15-19s15 7 15 19v14H17z" fill="${hair}"/>`:"";
+ const hairTop=[`<path d="M19 27c0-9 6-14 13-14s13 5 13 14c-3-4-8-6-13-6s-10 2-13 6z" fill="${hair}"/>`,
+  `<path d="M19 28c0-10 6-15 13-15s13 5 13 15c-2-5-7-8-13-8s-11 3-13 8z" fill="${hair}"/>`,
+  `<circle cx="32" cy="11" r="5" fill="${hair}"/><path d="M19 27c0-9 6-14 13-14s13 5 13 14c-3-5-8-6-13-6s-10 1-13 6z" fill="${hair}"/>`,
+  `<path d="M19 28c1-10 7-15 14-15 6 0 12 4 12 12-5-2-9-6-12-9-2 5-7 9-14 12z" fill="${hair}"/>`,
+  `<path d="M19 27c0-3 1-5 2-6v8zM45 27c0-3-1-5-2-6v8z" fill="${hair}"/>`][style];
+ const eyes=mood==="rest"?`<path d="M26 30q2 2 4 0M34 30q2 2 4 0" stroke="#1b1b1b" stroke-width="1.6" fill="none" stroke-linecap="round"/>`:`<circle cx="28" cy="30" r="1.7" fill="#1b1b1b"/><circle cx="36" cy="30" r="1.7" fill="#1b1b1b"/>`;
+ const brows=villain||mood==="low"?`<path d="M25 26l5 1.5M39 26l-5 1.5" stroke="${hair}" stroke-width="1.6" stroke-linecap="round"/>`:`<path d="M25 26.5q2.5-1.5 5 0M34 26.5q2.5-1.5 5 0" stroke="${hair}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+ const mouth={high:`<path d="M28 37q4 4 8 0" stroke="#5a2a22" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,low:`<path d="M28 39q4-3 8 0" stroke="#5a2a22" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,villain:`<path d="M28 38q5 1.5 8-1.5" stroke="#3a1a16" stroke-width="1.8" fill="none" stroke-linecap="round"/>`}[mood]||`<path d="M29 38h6" stroke="#5a2a22" stroke-width="1.8" stroke-linecap="round"/>`;
+ return `<svg class="portrait-svg" viewBox="0 0 64 64" role="img" aria-label="${safe(name)}"><rect width="64" height="64" fill="${bg}"/>${hairBack}<path d="M14 64c1-10 8-15 18-15s17 5 18 15z" fill="${shirt}"/><rect x="28" y="40" width="8" height="8" rx="3" fill="${skin}"/><ellipse cx="32" cy="30" rx="12" ry="14" fill="${skin}"/>${hairTop}${brows}${eyes}${glasses?`<g fill="none" stroke="${villain?"#c9b27a":"#1b1b1b"}" stroke-width="1.4"><circle cx="28" cy="30" r="3.6"/><circle cx="36" cy="30" r="3.6"/><path d="M31.6 30h.8"/></g>`:""}${moustache?`<path d="M28 35.5q4-2 8 0q-4 1.5-8 0z" fill="${hair}"/>`:""}${mouth}</svg>`;}
 
 /* ---------- Home: the desk ---------- */
-/** What needs the player now comes first; everything else lives on its own desk. */
+const LONG_DATE=new Intl.DateTimeFormat("en-GB",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"});
+/** Where the player is in the whole story, from the reported timeline to the endgame. */
+function journeyHTML(){const steps=["Act 1","Handoff","Chapter 1","Chapter 2","Chapter 3","Chapter 4","Endgame"];
+ const at=state.historicalRoleplay&&state.date<=timelineCutoff()?0:state.historicalRoleplay&&!state.handoff?1:!state.historicalRoleplay?2+Math.min(4,state.careerChapter||0):2+Math.min(4,state.careerChapter||0);
+ return `<ol class="journey" aria-label="Your story so far">${steps.map((s,i)=>`<li class="${i<at?"done":i===at?"now":""}"><i aria-hidden="true"></i><span>${s}</span></li>`).join("")}</ol>`;}
+/** The whole desk is meant to fit one screen: details live in dialogs and collapsible sections. */
 function deskHTML(){ensureState();const custom=!(state.historicalRoleplay&&state.flags.firstResponse);
- return `<section class="page command-page desk"><div class="command-title"><div><span>${safe(state.org.name)} · ${safe(state.phase)}</span><h1>Command desk</h1></div><p>${safe(state.player.name)} · ${safe(state.player.state||"India")}</p></div>${historyAlertHTML()}<div class="desk-grid"><div class="desk-main">${custom?commandDispatchHTML():careerDispatchHTML()}${injusticeFeedHTML()}${jantarHTML()}</div><aside class="desk-side">${keyActionsHTML()}${teamMiniHTML()}</aside></div></section>`;}
-function keyActionsHTML(){const btn=(act,icon,title,detail,extra="")=>`<button class="action-btn" data-act="${act}" ${extra}><span class="action-icon">${icon}</span><span><strong>${title}</strong><small>${detail}</small></span></button>`;
- return `<article class="panel action-panel"><div class="panel-title"><h3>Your days</h3><span>DAY ${state.day}</span></div><div class="action-list">${routineHTML()}
- ${!state.flags.firstResponse||!state.historicalRoleplay?btn("decision","⚡","Today's decision","A major choice is waiting."):""}
- ${state.date>="2026-06-06"&&state.date<="2026-07-25"?btn("campaign-day","◎","Run a protest day","Choose a field focus; crowd safety matters."):""}
- ${state.date>="2026-07-20"&&state.date<="2026-07-25"?btn("negotiate","◇","Set the negotiating position","Pick a demand and whether to brief publicly."):""}
- <div class="action-row">${btn("rest","☕","Rest","Recover energy.")}${btn("fundraise","₹","Donor drive","Transparent contributions.")}</div>
- ${btn("wait-dispatch","◷","Wait for the next dispatch",state.date>timelineCutoff()?"Up to 30 days; stops for anything new.":"Jumps to the next dated event.",!state.flags.firstResponse||state.pendingScenes.length||state.pendingCrisis?"disabled":"")}</div></article>`;}
-function teamMiniHTML(){const people=team().filter(x=>x.status!=="available");return `<article class="panel team-mini"><div class="panel-title"><h3>Team</h3><span>${people.length} WITH YOU</span></div>${people.length?`<ul>${people.map(x=>`<li><b>${safe(initials(x.name))}</b><span><strong>${safe(x.name)}</strong><small>${safe(x.signals[0]||x.role)}</small></span></li>`).join("")}</ul>`:`<p class="muted">No one has joined yet.</p>`}<button class="dispatch-action secondary" data-go="people">Open the People desk →</button></article>`;}
+ const alert=historyAlertHTML(),boundary=alert.includes("history-boundary");
+ return `<section class="page desk">
+  <header class="desk-head"><div><p class="desk-eyebrow">${safe(state.org.name)} · ${safe(state.phase)}</p><h1>Command desk</h1></div>
+   <div class="desk-day" aria-label="Day ${state.day}"><b>${state.day}</b><span>Day<br>${LONG_DATE.format(new Date(state.date+"T00:00:00Z"))}</span></div></header>
+  ${journeyHTML()}
+  ${boundary?"":alert}
+  <div class="desk-grid"><div class="desk-main">${custom?commandDispatchHTML():careerDispatchHTML()}${deskFeedHTML()}${jantarHTML()}</div>
+  <aside class="desk-side">${daysCardHTML()}${teamMiniHTML()}</aside></div></section>`;}
+/** Days left as a ring: full when a case arrives, empty on its last day. */
+function countdownRing(left,total){const r=15,c=2*Math.PI*r,frac=Math.max(0,Math.min(1,left/Math.max(1,total)));
+ return `<span class="ring ${left<=1?"urgent":""}"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="${r}" class="ring-track"/><circle cx="18" cy="18" r="${r}" class="ring-fill" stroke-dasharray="${(c*frac).toFixed(1)} ${c.toFixed(1)}"/></svg><b>${Math.max(0,left)}</b><small>${left===1?"day":"days"}</small></span>`;}
+/** The feed as a list of case rows; each opens its full case file. Outcomes and the outrage controls stay compact. */
+function deskFeedHTML(){ensureState();if(state.date<"2026-05-20"||!state.flags.firstResponse)return "";
+ const open=openInjustices(),recent=state.injustices.filter(x=>x.status!=="open").slice(0,5),o=Math.round(state.outrage),legal=state.org.legal;
+ const rows=open.map(x=>{const t=INJUSTICE_CASES.find(c=>c.id===x.id),bg=BEFORE_THE_MOVEMENT.find(b=>b.id===t.pattern);
+  return `<li><button type="button" class="case-row" data-case-open="${safe(x.uid)}">${countdownRing(daysBetween(state.date,x.dueOn),t.days)}<span class="case-text"><strong>${safe(t.title)}</strong><small>${safe(x.district)} · ${safe(bg.topic)} · fictional case</small></span><span class="case-go">Open case file ›</span></button></li>`;}).join("");
+ return `<section class="desk-card feed"><header class="card-head"><h2>Injustice feed</h2><span class="live">Live · ${open.length} open</span></header>
+  ${legal>=40?`<div class="legal-line"><span><b>Legal pressure ${legal}/100.</b> At 100 you are arrested.</span><button type="button" data-outrage="counsel">Retain senior counsel · ₹30,000</button></div>`:""}
+  <div class="outrage-line"><span class="outrage-label">Public outrage</span><span class="outrage-bar"><i style="width:${o}%"></i></span><b>${o}</b><button type="button" data-outrage="protest" ${o<30?"disabled title=\"Outrage must reach 30\"":""}>Protest</button><button type="button" data-outrage="report" ${o<20?"disabled title=\"Outrage must reach 20\"":""}>Report</button></div>
+  ${rows?`<ul class="case-list">${rows}</ul>`:`<p class="card-hint">No open cases today. They will come.</p>`}
+  ${recent.length?`<details class="recent"><summary>Recent outcomes <span>${recent.length}</span></summary><ul>${recent.map(x=>`<li class="${x.status}"><small>${safe(x.closedOn)} · ${x.status==="answered"?"Answered":"No one came"} · ${safe(x.district)}</small><strong>${safe(INJUSTICE_CASES.find(c=>c.id===x.id).title)}</strong><p>${safe(x.outcome)}</p></li>`).join("")}</ul></details>`:""}</section>`;}
+/** A case file: the full story, the documented pattern behind it, and the responses with their consequences. */
+function openCase(uid){ensureState();const x=state.injustices.find(v=>v.uid===uid);if(!x||x.status!=="open")return toast("This case is closed.");
+ const t=INJUSTICE_CASES.find(c=>c.id===x.id),bg=BEFORE_THE_MOVEMENT.find(b=>b.id===t.pattern),left=daysBetween(state.date,x.dueOn);
+ const modal=document.createElement("div");modal.className="decision-modal case-modal";
+ modal.innerHTML=`<div class="decision-box case-box"><div class="case-head">${countdownRing(left,t.days)}<div><small>CASE FILE · ${safe(x.district.toUpperCase())} · FICTIONAL</small><h2>${safe(t.title)}</h2></div></div><p class="case-body">${safe(fillDistrict(t.body,x.district))}</p>
+  <details class="why"><summary>Why this happens</summary><p>${safe(bg.record)} <a href="${safe(bg.url)}" target="_blank" rel="noopener noreferrer">${safe(bg.source)} ↗</a></p></details>
+  <div class="choices">${t.responses.map((r,i)=>`<button type="button" class="choice" data-respond="${i}"><span class="choice-key">${String.fromCharCode(65+i)}</span><span><strong>${safe(r.label)}</strong><small>${safe(r.detail)}</small>${effectChips(r.effect)}${r.evidence&&t.lead?`<span class="effect-chips"><i class="up">Evidence +${r.evidence}</i></span>`:""}</span></button>`).join("")}</div>
+  <p class="case-ignore">If no one comes: ${safe(fillDistrict(t.ignored.text,x.district))}</p><button type="button" class="modal-close">Decide later</button></div>`;
+ document.body.appendChild(modal);modal.querySelector(".modal-close").onclick=()=>modal.remove();
+ modal.querySelectorAll("[data-respond]").forEach(b=>b.onclick=()=>{try{respondInjustice(uid,b.dataset.respond);modal.remove();}catch(e){toast(e.message);}});}
+function segmentRow(key,label,values){const current=key.split(".").reduce((o,k)=>o?.[k],state);return `<div class="setting-row"><span>${safe(label)}</span><div class="seg" role="group" aria-label="${safe(label)}">${values.map(v=>`<button type="button" data-set="${key}" data-value="${v}" aria-pressed="${current===v}" class="${current===v?"on":""}">${v}</button>`).join("")}</div></div>`;}
+/** Your days: time controls always visible; the routine settings fold away once chosen. */
+function daysCardHTML(){const blocked=routineBlocked(),started=!!state.flags.firstResponse,r=state.routine;
+ const quick=(act,icon,title,detail,extra="")=>`<button type="button" class="quick" data-act="${act}" ${extra}><span class="quick-icon" aria-hidden="true">${icon}</span><span class="quick-text"><strong>${title}</strong><small>${detail}</small></span><span class="quick-go" aria-hidden="true">›</span></button>`;
+ const summary=`${r.fundraise} drive${r.fundraise===1?"":"s"} · ${r.rest} rest${state.phase!=="movement"?` · ${r.tours} tour${r.tours===1?"":"s"}`:""}`;
+ return `<section class="desk-card days"><header class="card-head"><h2>Your days</h2><span>Day ${state.day}</span></header>
+  ${started?`<div class="btn-pair"><button type="button" class="btn primary" data-act="advance-week" ${blocked?"disabled":""}>Advance a week</button><button type="button" class="btn ghost" data-act="advance-month" ${blocked?"disabled":""}>A month</button></div>
+  <details class="routine-details" ${state.ui?.routineOpen?"open":""}><summary>Weekly routine <span>${summary}</span></summary><div class="routine-rows">${segmentRow("routine.fundraise","Donor drives a week",[0,1,2,3])}${segmentRow("routine.rest","Rest days a week",[0,1,2])}${state.phase!=="movement"?segmentRow("routine.tours","Campaign tours a week",[0,1,2]):""}</div><p class="card-hint">Other days go to movement work. You rest when exhausted; anything that needs you stops the clock.</p></details>`:""}
+  <div class="quick-list">
+   ${!state.flags.firstResponse||!state.historicalRoleplay?quick("decision","⚡","Today's decision","A major choice is waiting"):""}
+   ${state.date>="2026-06-06"&&state.date<="2026-07-25"?quick("campaign-day","◎","Run a protest day","Choose a field focus"):""}
+   ${state.date>="2026-07-20"&&state.date<="2026-07-25"?quick("negotiate","◇","Set the negotiating position","Pick a demand"):""}
+   ${quick("rest","☕","Rest today","Recover energy")}${quick("fundraise","₹","Donor drive today","Small, disclosed contributions")}
+   ${quick("wait-dispatch","◷","Wait for the next dispatch",state.date>timelineCutoff()?"Up to 30 days":"Jump to the next dated event",!started||state.pendingScenes.length||state.pendingCrisis?"disabled":"")}
+  </div></section>`;}
+function teamMiniHTML(){const people=team().filter(x=>x.status!=="available"),shown=people.slice(0,5);
+ return `<section class="desk-card team-card"><header class="card-head"><h2>Your team</h2><span>${people.length} with you</span></header>
+  ${people.length?`<ul class="team-rows">${shown.map(x=>{const [mood,label]=moodOf(x);return `<li><button type="button" class="team-row" data-talk="${safe(x.id)}"><span class="avatar ${mood}" aria-hidden="true">${portrait(x.name,{mood})}</span><span class="team-text"><strong>${safe(x.name)}</strong><small>${safe(x.request?`Waiting on you: ${x.request.type}`:x.signals[0]||x.role)}</small></span><span class="mood ${mood}">${label}</span></button></li>`;}).join("")}</ul>`:`<p class="card-hint">No one has joined yet.</p>`}
+  <button type="button" class="btn ghost wide" data-go="people">${people.length>shown.length?`See all ${people.length} on the People desk`:"Open the People desk"}</button></section>`;}
 
 /* ---------- People as characters ---------- */
 /** A colleague's mood, read from what they show: never from their private numbers. */
 function moodOf(x){const s=x.signals.join(" ").toLowerCase();if(/exhausted|serious strain|morale has fallen|resentment|strained|unpaid|bruised/.test(s))return ["low","Struggling"];if(/energised|fiercely loyal|close friend|strongly trusts|speaks warmly/.test(s))return ["high","Fired up"];if(x.status==="on_leave")return ["rest","On leave"];return ["steady","Steady"];}
 function characterCardHTML(x){const [mood,label]=moodOf(x),joined=x.status!=="available";
- return `<article class="character ${mood} ${x.status}"><div class="character-face" aria-hidden="true">${safe(initials(x.name))}<i></i></div><div class="character-body"><strong>${safe(x.name)}</strong><small>${safe(joined?x.role:`Could be your ${x.suggestedRoleTitle}`)} · ${STAFF_STATUS[x.status]}</small><p class="character-line">${joined?safe(x.request?`“${x.request.detail}”`:x.signals[0]||""):safe(x.background)}</p>${joined?`<span class="mood-tag">${label}</span>`:""}</div><button type="button" class="talk-btn" data-talk="${safe(x.id)}">${joined?"Talk":"Approach"}</button></article>`;}
+ return `<article class="character ${mood} ${x.status}"><div class="character-face" aria-hidden="true">${portrait(x.name,{mood})}<i></i></div><div class="character-body"><strong>${safe(x.name)}</strong><small>${safe(joined?x.role:`Could be your ${x.suggestedRoleTitle}`)} · ${STAFF_STATUS[x.status]}</small><p class="character-line">${joined?safe(x.request?`“${x.request.detail}”`:x.signals[0]||""):safe(x.background)}</p>${joined?`<span class="mood-tag">${label}</span>`:""}</div><button type="button" class="talk-btn" data-talk="${safe(x.id)}">${joined?"Talk":"Approach"}</button></article>`;}
 /** Talking to someone: their story, what they remember, and what you can do, each option with its meaning. */
 function openTalk(id){ensureState();const x=team().find(v=>v.id===id);if(!x)return toast("They are not available.");const w=state.world,joined=x.status!=="available"&&x.status!=="former";
  const opt=(action,title,detail,extra={})=>({action,title,detail,...extra});const options=[];const first=x.name.split(" ")[0];
@@ -134,7 +204,7 @@ function openTalk(id){ensureState();const x=team().find(v=>v.id===id);if(!x)retu
  }
  const [mood,label]=moodOf(x);
  const modal=document.createElement("div");modal.className="decision-modal talk-modal";
- modal.innerHTML=`<div class="decision-box talk-box"><div class="talk-head"><div class="character-face big ${mood}" aria-hidden="true">${safe(initials(x.name))}<i></i></div><div><small>${safe(joined?`${x.role} · ${label}`:`Could be your ${x.suggestedRoleTitle}`)}</small><h2>${safe(x.name)}</h2><p class="muted">${safe(x.background)}${x.homeState?` From ${safe(x.homeState)}.`:""}</p></div></div>`+
+ modal.innerHTML=`<div class="decision-box talk-box"><div class="talk-head"><div class="character-face big ${mood}" aria-hidden="true">${portrait(x.name,{mood})}<i></i></div><div><small>${safe(joined?`${x.role} · ${label}`:`Could be your ${x.suggestedRoleTitle}`)}</small><h2>${safe(x.name)}</h2><p class="muted">${safe(x.background)}${x.homeState?` From ${safe(x.homeState)}.`:""}</p></div></div>`+
   (x.signals.length?`<div class="talk-read"><small>What you notice</small><ul>${x.signals.map(s=>`<li>${safe(s)}</li>`).join("")}</ul></div>`:"")+
   (x.memories.length?`<p class="staff-memory">They remember: ${x.memories.map(safe).join(" · ")}</p>`:"")+
   `<div class="choices">${options.map((o,i)=>`<button type="button" class="choice ${o.danger?"danger":""}" data-talk-action="${o.action}" ${o.disabled?`disabled title="${safe(o.disabled)}"`:""}><span class="choice-key">${String.fromCharCode(65+i)}</span><span><strong>${safe(o.title)}</strong><small>${safe(o.disabled||o.detail)}</small></span></button>`).join("")}</div><button type="button" class="modal-close">Leave it for now</button></div>`;
@@ -144,9 +214,11 @@ function openTalk(id){ensureState();const x=team().find(v=>v.id===id);if(!x)retu
 /** Meeting a candidate: what the interviews have shown so far, and the choice to hire. */
 function openCandidate(id){ensureState();const c=GameEngine.api().recruitmentView(state.world).find(v=>v.id===id);if(!c)return toast("That candidate has moved on.");
  const modal=document.createElement("div");modal.className="decision-modal talk-modal";
- modal.innerHTML=`<div class="decision-box talk-box"><div class="talk-head"><div class="character-face big steady" aria-hidden="true">${safe(initials(c.name))}<i></i></div><div><small>Candidate · best fit ${safe(c.suggestedRoleTitle)} · interviewed ${c.interviewLevel} of 2 times</small><h2>${safe(c.name)}</h2><p class="muted">${safe(c.background)} ${c.age}, from ${safe(c.homeState)}.</p></div></div>`+
+ modal.innerHTML=`<div class="decision-box talk-box"><div class="talk-head"><div class="character-face big steady" aria-hidden="true">${portrait(c.name)}<i></i></div><div><small>Candidate · best fit ${safe(c.suggestedRoleTitle)} · interviewed ${c.interviewLevel} of 2 times</small><h2>${safe(c.name)}</h2><p class="muted">${safe(c.background)} ${c.age}, from ${safe(c.homeState)}.</p></div></div>`+
   `<div class="talk-read"><small>What you have seen so far</small><ul>${c.headline.map(h=>`<li>${safe(h)}</li>`).join("")}${Object.entries(c.estimatedSkills).map(([k,v])=>`<li>${safe(k)}: ${safe(v)}</li>`).join("")}${c.concerns.map(h=>`<li class="concern">${safe(h)}</li>`).join("")}</ul></div>`+
   `<div class="choices"><button type="button" class="choice" data-cand="interview" ${c.interviewLevel>=2?"disabled":""}><span class="choice-key">A</span><span><strong>Interview them${c.interviewLevel?" again":""}</strong><small>${c.interviewLevel>=2?"You have learned what interviews can show.":"Costs 6 energy. Narrows the estimate and may surface a concern."}</small></span></button><button type="button" class="choice" data-cand="hire-candidate"><span class="choice-key">B</span><span><strong>Hire them · ₹${money(STAFF_SALARY)} a month</strong><small>You are hiring what you have seen, not what is hidden.</small></span></button><button type="button" class="choice" data-cand="volunteer-candidate"><span class="choice-key">C</span><span><strong>Take them on as a volunteer</strong><small>No salary. Ambitious people may not stay unpaid for long.</small></span></button></div><button type="button" class="modal-close">Not yet</button></div>`;
  document.body.appendChild(modal);modal.querySelector(".modal-close").onclick=()=>modal.remove();
  modal.querySelectorAll("[data-cand]").forEach(b=>b.onclick=()=>{modal.remove();GameEngine.dispatch("people",{action:b.dataset.cand,id});if(b.dataset.cand==="interview")setTimeout(()=>openCandidate(id),0);});
 }
+
+if(typeof document!=="undefined"&&document.addEventListener)document.addEventListener("toggle",e=>{if(e.target?.classList?.contains("routine-details")&&state.player){state.ui={...(state.ui||{}),routineOpen:e.target.open};}},true);

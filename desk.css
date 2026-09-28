@@ -1,0 +1,159 @@
+/* REPUBLIC: 543 · the Command desk
+   An editorial dossier that fits one screen: a centred column, one left edge, hairlines instead of nested boxes,
+   details in dialogs and collapsible sections, portraits instead of initials, and red only where it is urgent. */
+
+/* A centred column for the whole game: top bar, resource strip, ticker and every desk. */
+.game-main>.topbar,.game-main>.hud,.game-main>.news-strip,.game-main>#page-content{max-width:1280px;margin-left:auto;margin-right:auto}
+
+.desk{
+  --d-card:#17191c;--d-card-2:#1d2024;--d-line:rgba(255,255,255,.08);--d-line-2:rgba(255,255,255,.14);
+  --d-ink:#f2ede5;--d-muted:#9da2a6;--d-soft:#c9c4bb;--d-gold:#e3bd5c;--d-red:#e0453d;--d-red-soft:rgba(224,69,61,.14);
+  --d-green:#8fc29d;--d-pad:22px;--d-gap:20px;--d-radius:12px;color:var(--d-ink)}
+
+/* Heading: title on the left, a calendar tile for the day on the right. */
+.desk .desk-head{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:6px 0 14px}
+.desk .desk-eyebrow{margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--d-gold)}
+.desk .desk-head h1{margin:0;font-size:clamp(28px,3vw,38px);line-height:1;letter-spacing:-.02em;font-weight:800;color:var(--d-ink)}
+.desk .desk-day{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;background:var(--d-card);border:1px solid var(--d-line);border-radius:var(--d-radius)}
+.desk .desk-day b{display:grid;place-items:center;min-width:52px;height:52px;padding:0 8px;border-radius:9px;background:var(--d-red);color:#fff;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.desk .desk-day span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-muted);line-height:1.5}
+
+/* The journey: where you are in the whole story. */
+.desk .journey{display:flex;list-style:none;margin:0 0 var(--d-gap);padding:0}
+.desk .journey li{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6d7276}
+.desk .journey li::before{content:"";position:absolute;top:6px;left:-50%;right:50%;height:2px;background:#2c3034}
+.desk .journey li:first-child::before{display:none}
+.desk .journey li i{position:relative;z-index:1;width:14px;height:14px;border-radius:50%;background:#2c3034;border:2px solid #17191c}
+.desk .journey li.done{color:var(--d-soft)}.desk .journey li.done::before,.desk .journey li.done i{background:var(--d-gold)}
+.desk .journey li.now{color:var(--d-ink)}.desk .journey li.now::before{background:var(--d-gold)}
+.desk .journey li.now i{background:var(--d-red);box-shadow:0 0 0 4px rgba(224,69,61,.25)}
+@media(max-width:640px){.desk .journey span{display:none}.desk .journey li.now span{display:block;position:absolute;top:20px;white-space:nowrap}.desk .journey{margin-bottom:34px}}
+
+/* The grid */
+.desk .desk-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--d-gap);align-items:start}
+.desk .desk-main,.desk .desk-side{display:flex;flex-direction:column;gap:var(--d-gap);min-width:0}
+.desk .desk-side{position:sticky;top:12px}
+@media(max-width:1080px){.desk .desk-grid{grid-template-columns:1fr}.desk .desk-side{position:static}}
+
+/* One card style for everything on the desk. */
+.desk .desk-card,.desk .command-dispatch,.desk .jantar-panel,.desk .historical-alert{
+  margin:0!important;padding:var(--d-pad)!important;background:var(--d-card)!important;border:1px solid var(--d-line)!important;border-radius:var(--d-radius)!important;box-shadow:none!important;color:var(--d-ink)}
+.desk .card-head,.desk .panel-title,.desk .dispatch-top{display:flex!important;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 14px!important;padding:0 0 12px!important;border-bottom:1px solid var(--d-line)!important;background:transparent!important}
+.desk .card-head h2,.desk .panel-title h3{margin:0;font-size:16px!important;font-weight:750;letter-spacing:-.01em;color:var(--d-ink)!important;text-transform:none}
+.desk .panel-title h3:before{display:none!important}
+.desk .card-head>span,.desk .panel-title>span,.desk .dispatch-top span{font-size:11px!important;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted)!important}
+.desk .card-hint{margin:10px 0 0;font-size:13px;line-height:1.55;color:var(--d-muted)}
+
+/* The next move */
+.desk .command-dispatch{border-left:3px solid var(--d-red)!important}
+.desk .dispatch-content,.desk .dispatch-brief{display:block!important;padding:0!important;min-height:0!important}
+.desk .dispatch-kicker{margin:0 0 6px!important;font-size:11px!important;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--d-gold)!important}
+.desk .command-dispatch h2{margin:0 0 8px!important;font-size:clamp(22px,2.2vw,28px)!important;line-height:1.15;letter-spacing:-.02em;color:var(--d-ink)!important;max-width:none}
+.desk .command-dispatch p{max-width:68ch;margin:0 0 8px;font-size:14.5px;line-height:1.6;color:var(--d-soft)!important}
+.desk .chapter-goal{color:var(--d-gold)!important;font-weight:650}
+.desk .dispatch-aside{display:none}
+
+/* Buttons */
+.desk .btn,.desk .dispatch-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:1px solid transparent;transform:none!important}
+.desk .dispatch-action,.desk .btn.primary{margin-top:4px;background:var(--d-red)!important;color:#fff!important;border-color:var(--d-red)!important}
+.desk .dispatch-action:hover:not(:disabled),.desk .btn.primary:hover:not(:disabled){background:#ea5a52!important}
+.desk .btn.ghost{background:transparent;color:var(--d-ink);border-color:var(--d-line-2)}
+.desk .btn.ghost:hover:not(:disabled){border-color:var(--d-gold);color:var(--d-gold)}
+.desk .btn.wide{width:100%;margin-top:12px}
+.desk .btn:disabled,.desk .dispatch-action:disabled{opacity:.4;cursor:not-allowed}
+.desk .btn-pair{display:grid;grid-template-columns:1fr auto;gap:8px}
+.desk .btn-pair .btn{margin-top:0!important}
+
+/* Collapsible sections */
+.desk details>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:700;color:var(--d-soft)}
+.desk details>summary::-webkit-details-marker{display:none}
+.desk details>summary::after{content:"▾";color:var(--d-muted);font-size:12px}
+.desk details[open]>summary::after{content:"▴"}
+.desk details>summary span{margin-left:auto;font-weight:600;color:var(--d-muted)}
+.desk details>summary:hover{color:var(--d-gold)}
+
+/* Your days */
+.desk .routine-details{margin-top:12px;padding:10px 0 0;border-top:1px solid var(--d-line)}
+.desk .routine-rows{margin-top:8px}
+.desk .setting-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0}
+.desk .setting-row>span{font-size:13.5px;color:var(--d-soft)}
+.desk .seg{display:inline-flex;padding:3px;background:#0f1113;border:1px solid var(--d-line);border-radius:8px;gap:2px}
+.desk .seg button{min-width:32px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--d-muted);font-weight:700;cursor:pointer}
+.desk .seg button:hover{color:var(--d-ink)}.desk .seg button.on{background:var(--d-gold);color:#17140c}
+.desk .quick-list{display:flex;flex-direction:column;margin-top:12px;border-top:1px solid var(--d-line)}
+.desk .quick{display:grid;grid-template-columns:32px minmax(0,1fr) 12px;gap:12px;align-items:center;width:100%;padding:9px 0;background:transparent;border:0;border-bottom:1px solid var(--d-line);color:var(--d-ink);text-align:left;cursor:pointer}
+.desk .quick:last-child{border-bottom:0}
+.desk .quick:hover:not(:disabled) .quick-go,.desk .quick:hover:not(:disabled) strong{color:var(--d-gold)}
+.desk .quick:disabled{opacity:.4;cursor:not-allowed}
+.desk .quick-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--d-card-2);border:1px solid var(--d-line);color:var(--d-gold);font-size:13px}
+.desk .quick-text strong{display:block;font-size:13.5px;font-weight:650}.desk .quick-text small{display:block;font-size:12px;color:var(--d-muted)}
+.desk .quick-go{font-size:18px;color:var(--d-muted)}
+
+/* Portraits */
+.portrait-svg{display:block;width:100%;height:100%;border-radius:50%}
+.desk .avatar,.character-face,.portrait.dossier,#avatar-mini{overflow:hidden;padding:0!important}
+#avatar-mini svg{width:100%;height:100%}
+.character-face{background:#2a2d31!important}.character-face>i{z-index:2}
+.portrait.dossier{width:44px;height:44px;border-radius:50%!important;border:2px solid #5a2a2a!important;filter:saturate(.85)}
+
+/* Your team */
+.desk .team-rows{list-style:none;margin:0;padding:0}
+.desk .team-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:8px 0;background:transparent;border:0;border-bottom:1px solid var(--d-line);color:var(--d-ink);text-align:left;cursor:pointer}
+.desk .team-rows li:last-child .team-row{border-bottom:0}
+.desk .team-row:hover strong{color:var(--d-gold)}
+.desk .avatar{width:42px;height:42px;display:block;border-radius:50%;border:2px solid #555a5d}
+.desk .avatar.high{border-color:var(--d-green)}.desk .avatar.low{border-color:var(--d-red)}.desk .avatar.rest{border-color:#d69b56}
+.desk .team-text strong{display:block;font-size:14px;font-weight:650}.desk .team-text small{display:block;font-size:12px;color:var(--d-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desk .mood{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-muted)}
+.desk .mood.high{color:var(--d-green)}.desk .mood.low{color:var(--d-red)}.desk .mood.rest{color:#d69b56}
+
+/* The injustice feed: compact rows that open case files. */
+.desk .live{color:var(--d-red)!important}
+.desk .live::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--d-red);vertical-align:1px}
+.desk .legal-line{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border-left:2px solid var(--d-red);background:var(--d-red-soft);border-radius:0 8px 8px 0;font-size:13px;color:var(--d-soft)}
+.desk .legal-line b{color:#ff9a93}
+.desk .legal-line button,.desk .outrage-line button{min-height:32px;padding:0 12px;border-radius:8px;background:transparent;color:var(--d-ink);border:1px solid var(--d-line-2);font-size:12.5px;font-weight:700;cursor:pointer}
+.desk .legal-line button:hover,.desk .outrage-line button:hover:not(:disabled){border-color:var(--d-gold);color:var(--d-gold)}
+.desk .outrage-line button:disabled{opacity:.35;cursor:not-allowed}
+.desk .outrage-line{display:grid;grid-template-columns:auto minmax(60px,1fr) auto auto auto;gap:10px;align-items:center;margin-bottom:6px}
+.desk .outrage-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted)}
+.desk .outrage-bar{height:5px;border-radius:5px;background:#2a2d31;overflow:hidden}.desk .outrage-bar i{display:block;height:100%;background:linear-gradient(90deg,#e3bd5c,var(--d-red))}
+.desk .outrage-line>b{font-size:14px;min-width:24px;text-align:right}
+.desk .case-list{list-style:none;margin:8px 0 0;padding:0}
+.desk .case-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;padding:12px 0;background:transparent;border:0;border-top:1px solid var(--d-line);color:var(--d-ink);text-align:left;cursor:pointer}
+.desk .case-row:hover .case-text strong,.desk .case-row:hover .case-go{color:var(--d-gold)}
+.desk .case-text strong{display:block;font-size:15.5px;font-weight:700}.desk .case-text small{display:block;margin-top:2px;font-size:12px;color:var(--d-muted)}
+.desk .case-go{font-size:12.5px;font-weight:700;color:var(--d-soft);white-space:nowrap}
+@media(max-width:560px){.desk .case-go{display:none}.desk .outrage-line{grid-template-columns:1fr auto auto}.desk .outrage-label{grid-column:1/-1}.desk .outrage-bar{grid-column:1/-1}}
+.ring{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:48px;height:48px}
+.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:#2a2d31;stroke-width:3}.ring-fill{fill:none;stroke:#e3bd5c;stroke-width:3;stroke-linecap:round}
+.ring.urgent .ring-fill{stroke:#e0453d}
+.ring b{position:relative;font-size:15px;font-weight:800;line-height:1;color:#f2ede5}.ring small{position:relative;margin-top:1px;font-size:7px;font-weight:700;letter-spacing:.08em;line-height:1;text-transform:uppercase;color:#9da2a6}
+.desk .recent{margin-top:10px;padding-top:10px;border-top:1px solid var(--d-line)}
+.desk .recent ul{list-style:none;margin:8px 0 0;padding:0}
+.desk .recent li{padding:8px 0 8px 12px;border-left:2px solid var(--d-line-2);margin-bottom:6px}
+.desk .recent li.ignored{border-left-color:var(--d-red)}.desk .recent li.answered{border-left-color:var(--d-green)}
+.desk .recent small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--d-muted)}.desk .recent .ignored small{color:#f08a83}
+.desk .recent strong{display:block;margin:2px 0;font-size:14px}.desk .recent p{margin:0;font-size:13px;color:var(--d-soft)}
+
+/* The case file dialog */
+.case-box{max-width:760px}
+.case-head{display:flex;gap:16px;align-items:center;margin-bottom:10px}
+.case-head .ring{width:56px;height:56px;flex:none}
+.case-head small{font-size:11px;font-weight:700;letter-spacing:.12em;color:#e3bd5c}.case-head h2{margin:4px 0 0}
+.case-body{font-size:16px;line-height:1.65}
+.case-box .why{margin:4px 0 14px;padding:10px 12px;border-left:2px solid #e3bd5c;background:rgba(227,189,92,.06)}
+.case-box .why summary{cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#e3bd5c}
+.case-box .why p{margin:8px 0 0;font-size:13px;color:#c9c4bb}.case-box .why a{color:#e3bd5c}
+.case-box .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.case-box .choice{display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;height:100%}
+.case-ignore{margin:14px 0 0;padding:10px 12px;border-left:2px solid #e0453d;background:rgba(224,69,61,.08);font-size:13px;color:#f0b3ae}
+
+/* Historical alert and Jantar preparation follow the same card rules. */
+.desk .historical-alert{border-left:3px solid var(--d-gold)!important}
+.desk .historical-alert small{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--d-gold)}
+.desk .historical-alert h3{margin:6px 0;font-size:20px}.desk .historical-alert p{max-width:72ch;color:var(--d-soft)}
+.desk .historical-alert button{min-height:40px;padding:0 18px;border-radius:8px;background:var(--d-gold)!important;color:#17140c!important;border:0;font-weight:700}
+
+@media(max-width:600px){.desk{--d-pad:16px;--d-gap:14px}.desk .desk-day span{display:none}}
