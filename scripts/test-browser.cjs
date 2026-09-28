@@ -337,6 +337,13 @@ vm.runInContext(`state.pendingScenes=[];state.operationFollowups=[{id:'review-te
 assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits for a completed operation report');
 vm.runInContext(`fileOperationReview('review-test','audit');`,context);
 assert.equal(vm.runInContext('state.operationFollowups.length',context),0,'filing a report clears its routine blocker');
+// Field leads now create a decision and a later consequence, instead of paying out as one click.
+vm.runInContext(`state={date:'2026-10-01',day:1,phase:'movement',player:{name:'Test',energy:70,stress:10},org:{name:'Watch',funds:50000,credibility:45,media:0,legal:0,volunteers:30},support:20,flags:{firstResponse:'Organise'}};ensureState();offerFieldIncident('signal','Kerala');advanceDay();`,context);
+assert.ok(vm.runInContext('routineBlocked()',context),'a field incident pauses the routine when it reaches the desk');
+vm.runInContext(`var incident=dueFieldIncident();resolveFieldIncident(incident.id,'consent');advanceDay();advanceDay();`,context);
+assert.ok(vm.runInContext('dueFieldIncident()?.incidentId',context),'the initial field choice returns as a later follow-up');
+vm.runInContext(`resolveFieldIncidentFollowup(dueFieldIncident().id,'keep-word');`,context);
+assert.equal(vm.runInContext('!!dueFieldIncident()',context),false,'the field follow-up resolves cleanly');
 
 // Asking before acting: world-changing clicks always ask; navigation, pickers and story buttons do not.
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
