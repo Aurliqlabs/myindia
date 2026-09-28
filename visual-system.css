@@ -284,3 +284,11 @@ button:active:not(:disabled){filter:brightness(.9)}
 .civic-status{font-weight:700;color:#fff1d0!important}
 .civic-file .management-actions{display:flex;flex-wrap:wrap;gap:8px}
 .civic-file .management-actions button{white-space:normal;text-align:left}
+.handoff-form{display:grid;gap:14px;max-width:650px}
+.handoff-form h2{color:#f5eee2}
+.handoff-form p{margin:0;color:#ddd7cb;line-height:1.5}
+.handoff-form label{display:grid;gap:6px;color:#f2e9db;font-weight:700}
+.handoff-form input,.handoff-form select{width:100%;min-width:0;padding:12px 14px;background:#1c2020;border:1px solid #767269;color:#fffaf0;font:inherit;border-radius:8px 3px 8px 3px}
+.handoff-form input:focus-visible,.handoff-form select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.handoff-form .dispatch-action{justify-self:start}
+.chapter-goal{color:#f1ce84!important;font-weight:700}

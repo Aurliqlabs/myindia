@@ -1,4 +1,16 @@
-/* Verified public events through 25 September 2026. Player responses are fictional. */
+/* Reported public events through 28 September 2026. Player responses are fictional. */
+const MILESTONE_RESPONSES={
+ "cjp-founded":[["Invite careful volunteers","Start a small team with a code of conduct.",{volunteers:14,credibility:1,energy:-6}],["Write the first public note","Explain what the new movement can and cannot claim.",{media:2,credibility:2,energy:-5}],["Talk to students first","Listen before announcing a wider campaign.",{support:2,energy:-5}]],
+ "cjp-jantar":[["Set up water and first aid","Protect people in the crowd during the reported gathering.",{funds:-2500,credibility:2,volunteers:4,energy:-5}],["Assign a legal liaison","Document police conditions and emergency contacts.",{funds:-2500,legal:-2,energy:-5}],["Run a listening circle","Give affected students space to name their priorities.",{support:2,volunteers:5,energy:-7}]],
+ "cjp-extension":[["Read the police order","Ask counsel to verify the permitted time and lawful alternatives.",{legal:-3,credibility:2,energy:-5}],["Help people leave safely","Coordinate exits and protect vulnerable attendees.",{credibility:2,volunteers:3,energy:-5}],["Request a fresh site","Seek another legal venue for the movement.",{media:1,legal:-1,energy:-6}]],
+ "cjp-minister":[["Record the announced outcome","Keep the public claim precise and ask what examination changes follow.",{credibility:3,energy:-5}],["Thank the field volunteers","Retain the people who carried the campaign through the long weeks.",{volunteers:12,energy:-5}],["Meet affected students again","Ask what remains unresolved after the reported resignation.",{support:2,energy:-6}]],
+ "cjp-pressure-group":[["Open local listening cells","Build a national civic network under the reported pressure-group strategy.",{volunteers:12,support:1,energy:-7}],["Create a public ledger","Publish the movement's finances and decision rules.",{credibility:3,energy:-5}],["Train field researchers","Turn protest momentum into careful documentation.",{credibility:2,volunteers:5,energy:-6}]],
+ "cjp-schools":[["Obtain school permissions","Agree on privacy and access before a fictional local audit.",{legal:-2,credibility:2,energy:-5}],["Build an evidence checklist","Record facilities without identifying children.",{credibility:3,energy:-6}],["Hear teachers and parents","Collect conflicting accounts before reaching a conclusion.",{support:2,energy:-6}]],
+ "cjp-latur-fir":[["Preserve the visit records","Seek a lawyer and avoid presuming anyone's guilt.",{legal:-3,credibility:2,energy:-5}],["Ask for an independent account","Document witnesses and invite the institution's response.",{credibility:3,energy:-6}],["Pause new school visits","Review permissions while reducing exposure.",{legal:-2,media:-2,energy:2}]],
+ "cjp-march-withdrawn":[["Explain the withdrawal","Share what was promised and how volunteers can monitor it.",{credibility:2,energy:-5}],["Track the cases","Ask the legal desk to follow the court proceedings.",{legal:-2,energy:-6}],["Move to local meetings","Keep organisers engaged without claiming a march took place.",{volunteers:7,energy:-6}]],
+ "cjp-adivasi-schools":[["Invite local leadership","Let families and community members set the questions for a fictional audit.",{support:2,credibility:2,energy:-6}],["Request inspection records","Seek public facilities data before alleging deficiencies.",{credibility:3,energy:-5}],["Train privacy stewards","Keep children and witnesses out of campaign imagery.",{legal:-2,credibility:2,energy:-5}]],
+ "cjp-eci-demand":[["Read the underlying records","Check the electoral-roll allegations before repeating them.",{credibility:3,energy:-5}],["Request an official response","Put specific questions to the election authority.",{credibility:2,media:1,energy:-5}],["Prepare lawful assembly plans","Check safety and permissions without presuming an outcome.",{volunteers:6,energy:-6}]]
+};
 const REAL_SCENES = Object.freeze([
   {
     id:"court-clarification",date:"2026-05-25",region:"New Delhi",title:"The viral remark and the clarification",
@@ -56,6 +68,20 @@ const REAL_SCENES = Object.freeze([
     id:"cjp-eci-demand",date:"2026-09-24",region:"New Delhi",title:"CJP turns to electoral accountability",
     fact:"CJP demanded Chief Election Commissioner Gyanesh Kumar’s resignation and said it could organise another Jantar Mantar protest. Its allegations about electoral-roll changes remain claims to examine, not established findings in this game.",scene:"The ultimatum is public. On the next day, your fictional career can begin with a live political question and no known outcome.",
     source:"The Indian Express",url:"https://indianexpress.com/article/political-pulse/cjp-demands-election-commissioner-gyanesh-kumar-resignation-jantar-mantar-10892653/",status:"ATTRIBUTED CLAIM",archive:true
+  },
+  {
+    id:"cjp-image-case",date:"2026-09-25",region:"New Delhi",title:"A court orders removal of morphed images",
+    fact:"NDTV reported that the Delhi High Court directed Meta to remove a woman's objectionable morphed images and issued notices to CJP leaders. An FIR named unknown persons; notices do not establish the leaders' guilt.",
+    scene:"The movement's public reach now carries a duty to protect a private person. The historical court action stands regardless of your response.",
+    source:"NDTV",url:"https://www.ndtv.com/india-news/high-court-asks-meta-to-remove-womans-morphed-images-cjp-leaders-get-notices-12097306",status:"REPORTED COURT ACTION",
+    choices:[{label:"Protect the affected person",detail:"Ask volunteers to remove copies and document the response without sharing the images.",effect:{credibility:3,energy:-5}},{label:"Seek legal advice",detail:"Preserve evidence and clarify responsibilities while respecting the court's direction.",effect:{funds:-4000,legal:-3,energy:-4}}]
+  },
+  {
+    id:"cjp-mumbai-permission",date:"2026-09-27",region:"Mumbai",title:"Permission is denied for an October gathering",
+    fact:"The Times of India reported that Mumbai Police declined permission for CJP's proposed October 2 gathering and that CJP announced a Jail Bharo agitation. The October 2 event itself has not happened in this historical record.",
+    scene:"The field team must read the written reasons, consider access to hospitals and protect a peaceful route forward. The police decision and CJP announcement are historical; your planning is a game response.",
+    source:"The Times of India",url:"https://timesofindia.indiatimes.com/city/mumbai/cockroach-janta-party-announces-jail-bharo-andolan-after-mumbai-police-denies-protest-permission/articleshow/134525016.cms",status:"REPORTED",
+    choices:[{label:"Review the permit refusal",detail:"Ask counsel to check the stated reasons and consider an alternative location.",effect:{funds:-5000,credibility:3,legal:-2,energy:-5}},{label:"Prepare volunteer safety",detail:"Map accessibility, crowd safety and emergency routes for any lawful gathering.",effect:{funds:-6000,volunteers:12,energy:-6}}]
   },
   {
     id:'government-2024',date:'2024-06-09',region:'New Delhi',title:'A new Union government takes oath',
@@ -139,5 +165,4 @@ const REAL_SCENES = Object.freeze([
       {label:'Return to local organising',detail:'Focus on direct contact with supporters.',effect:{volunteers:18,support:1,energy:-6}}
     ]
   }
-].map(scene=>Object.freeze({...scene,archive:scene.date<"2026-05-14",choices:scene.date<"2026-05-14"?undefined:(scene.choices??[{label:"Verify and brief",detail:"Document the situation before speaking.",effect:{credibility:2,energy:-5}},{label:"Organise locally",detail:"Mobilise volunteers while preserving the reported facts.",effect:{volunteers:5,energy:-7}},{label:"Observe and protect your time",detail:"Study the report while maintaining your job.",effect:{energy:3}}])})).sort((a,b)=>a.date.localeCompare(b.date)));
-
+].map(scene=>Object.freeze({...scene,archive:scene.date<"2026-05-14",choices:scene.date<"2026-05-14"?undefined:(scene.choices??(MILESTONE_RESPONSES[scene.id]?.map(([label,detail,effect])=>({label,detail,effect}))??[{label:"Verify and brief",detail:"Document the situation before speaking.",effect:{credibility:2,energy:-5}},{label:"Organise locally",detail:"Mobilise volunteers while preserving the reported facts.",effect:{volunteers:5,energy:-7}},{label:"Observe and protect your time",detail:"Study the report while maintaining your job.",effect:{energy:3}}]))})).sort((a,b)=>a.date.localeCompare(b.date)));
