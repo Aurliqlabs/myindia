@@ -189,3 +189,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
  .statbox{padding:8px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Preparations are selectable tasks, not full-width decision cards. */
+.jantar-panel{padding:18px;margin-bottom:16px}
+.jantar-panel>p{color:#d3d0c7;max-width:85ch;margin:0 0 14px}
+.jantar-panel .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:0}
+.jantar-panel .choice{display:flex;align-items:center;min-height:52px;padding:10px 13px;font-size:13px;font-weight:650;line-height:1.25;text-align:left;text-transform:capitalize;color:var(--ink);overflow-wrap:anywhere}
+.jantar-panel .choice:disabled{background:#303735;color:#c9d4c7;opacity:.75;border-color:#67776a}
+@media(max-width:480px){.jantar-panel .choices{grid-template-columns:repeat(2,minmax(0,1fr))}.jantar-panel .choice{font-size:12px;padding:9px;min-width:0}}
