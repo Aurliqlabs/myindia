@@ -14,7 +14,7 @@ const NETWORK=[
 ];
 const INSTITUTION_LABELS={agency:"Investigating agency independence",courts:"Court capacity",protection:"Witness protection"};
 const PRIDE_LABELS={exams:"Fair examinations",schools:"Schools",health:"Health and drug safety",justice:"Justice and policing",integrity:"Clean public life",prosperity:"Work and wages"};
-const CHAIRMAN_AGENCY_THRESHOLD=60;
+const CHAIRMAN_AGENCY_THRESHOLD=70;
 /* Bills cost political capital (mandate), not party money. Mandate regenerates slowly while governing. */
 const BILLS=[
  {id:"lokpal",title:"Independent Anti-Corruption Commission Act",detail:"An investigating agency that answers to Parliament, not ministers.",capital:12,days:45,inst:{agency:35},pride:{integrity:10}},

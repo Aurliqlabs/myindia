@@ -57,7 +57,7 @@ Behind the cases is a **fictional network**: a coaching-chain owner selling exam
 
 - Evidence from cases and published exposés lets you file a complaint with an investigating agency. Investigations crawl unless the agency is independent. Trials last months, witnesses turn hostile without protection, and verdicts weigh evidence, witnesses, court capacity and how powerful the accused is. Acquittals can be appealed.
 - The network strikes back: office raids that freeze funds, smear campaigns, and bribes offered to your staff. Whether a colleague accepts depends on their hidden integrity and greed. One who refuses brings you evidence; one who accepts leaks your case files.
-- After two convictions, a lieutenant names the Chairman. No agency will investigate him until its independence reaches 60, which takes laws passed in government or reforms won by the civic route. Even when convicted, he appeals to the High Court.
+- After two convictions, a lieutenant names the Chairman. No agency will investigate him until its independence reaches 70, which takes laws passed in government or reforms won by the civic route. Even when convicted, he appeals to the High Court.
 
 **Nobody is jailed by the player.** Courts decide, and they convict only when evidence, protected witnesses and independent institutions are in place.
 
@@ -77,7 +77,15 @@ In government, nine laws cost political capital (mandate), take weeks in Parliam
 | **The Body Gives Out** | A third collapse from exhaustion |
 | **The Unfinished Republic** | 1 June 2036 arrives, ten years in, with the work not done |
 
-It is meant to be slow and hard. In the balance simulator, a disciplined electoral strategy reaches **A Republic Restored** in 7 of 12 runs, between 2034 and 2036. Unfocused strategies never do. If you keep Dipke's name, the ending is labelled alternate history.
+It is meant to be slow and hard. In the balance simulator, a disciplined electoral strategy reaches **A Republic Restored** in about three runs out of four, between late 2032 and 2035. Unfocused strategies never do. If you keep Dipke's name, the ending is labelled alternate history.
+
+### Time and the weekly routine
+
+Most actions take a day. Rather than clicking the same upkeep every day, set a **weekly routine** on the Home desk: how many donor drives (0–3), rest days (0–2) and, once the party exists, campaign tours (0–2). Then **Advance a week** or **Advance a month**. Tours go to the state where the party is weakest for its size and pause when money is needed for a general election. You rest automatically when exhausted.
+
+The clock stops for anything that needs you: a historical dispatch, a new injustice case, a national crisis, the handoff, an open general election, an anonymous tip or an ending. Donors recover between appeals, so a steady two drives a week raises more over time than grinding every day.
+
+A winning game takes about 1,500–2,000 decisions with the routine, against about 3,000 without it.
 
 ### Your team
 

@@ -241,7 +241,7 @@ vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';stat
 const firstDrive=vm.runInContext('state.donations[0].amount',context);
 vm.runInContext(`state.pendingScenes=[];performAction('fundraise');`,context);
 assert.ok(vm.runInContext('state.donations[0].amount',context)<firstDrive,'back-to-back donor drives raise less');
-assert.equal(vm.runInContext('state.donorFatigue',context),24,'repeated appeals build donor fatigue');
+assert.equal(vm.runInContext('state.donorFatigue',context),20,'repeated appeals build donor fatigue');
 vm.runInContext(`for(let i=0;i<12;i++)advanceDay();`,context);
 assert.equal(vm.runInContext('state.donorFatigue',context),0,'donors recover after a break');
 vm.runInContext(`state.support=30;performAction('rest');`,context);
@@ -307,7 +307,7 @@ assert.equal(vm.runInContext('state.network.sood.stage',context),'investigation'
 vm.runInContext(`state.institutions={agency:90,courts:90,protection:90};for(let i=0;i<800&&!['convicted','acquitted'].includes(state.network.sood.stage);i++){state.player.energy=100;state.player.health=100;state.org.legal=0;advanceDay();}`,context);
 assert.ok(['convicted','acquitted'].includes(vm.runInContext('state.network.sood.stage',context)),'investigations lead to a verdict');
 vm.runInContext(`state.network.chairman.revealed=true;state.network.chairman.evidence=20;state.institutions.agency=40;`,context);
-assert.throws(()=>vm.runInContext(`networkAction('complain','chairman')`,context),/independence reaches 60/,'the Chairman needs an independent agency');
+assert.throws(()=>vm.runInContext(`networkAction('complain','chairman')`,context),/independence reaches 70/,'the Chairman needs an independent agency');
 // Government: bills change institutions and the pride index.
 vm.runInContext(`state.phase='government';state.governance.mandate=90;state.elections.unshift({seats:320});state.org.funds=500000;var inst=state.institutions.protection;introduceBill('witness');state.bills.witness.voteOn=state.date;var realRoll=roll;roll=()=>0;advanceDay();roll=realRoll;`,context);
 assert.ok(vm.runInContext('state.bills.witness.passedOn&&state.institutions.protection>inst',context),'a passed bill strengthens institutions');
@@ -319,4 +319,15 @@ assert.equal(vm.runInContext('state.ending.id',context),'restored');
 assert.ok(vm.runInContext('endingStory().lines.join(" ")',context).includes('Chairman'),'the ending tells the story');
 vm.runInContext(`state.ending=null;state.org.legal=100;checkEndings();`,context);
 assert.equal(vm.runInContext('state.ending.id',context),'arrested','unchecked legal pressure ends the story');
-console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar, campaign and Act 3 checks passed.');
+
+// The weekly routine runs upkeep by itself and stops for anything that needs the player.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-10-05';state.pendingScenes=[];completeHandoff('Bot','Watch','civic');state.org.funds=50000;state.player.energy=90;state.routine={fundraise:2,rest:1,tours:0};var realSpawn2=spawnInjustice;spawnInjustice=()=>{};var d0=state.day,gifts=state.donations.length;advanceWithRoutine(7);spawnInjustice=realSpawn2;`,context);
+assert.equal(vm.runInContext('state.day-d0',context),7,'a quiet week runs all seven days');
+assert.equal(vm.runInContext('state.donations.length-gifts',context),2,'the routine runs the chosen donor drives');
+assert.ok(vm.runInContext('state.history.some(h=>h.title==="Routine")',context),'the week is summarised in one log entry');
+vm.runInContext(`d0=state.day;state.injustices=[];for(let i=0;i<60&&!openInjustices().length;i++)advanceDay();state.injustices=[];var stop=state.day;advanceWithRoutine(28);`,context);
+assert.ok(vm.runInContext('state.day-stop<=28',context));
+assert.ok(vm.runInContext('state.lastCaseOn===state.date||state.day-stop===28',context),'a new case stops the routine on the day it arrives');
+vm.runInContext(`state.pendingScenes=['exam-remark'];`,context);
+assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits while a dispatch is unanswered');
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar, campaign, Act 3 and routine checks passed.');
