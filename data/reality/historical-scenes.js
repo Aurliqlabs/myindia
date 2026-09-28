@@ -85,6 +85,13 @@ const REAL_SCENES = Object.freeze([
     choices:[{label:"Review the permit refusal",detail:"Ask counsel to check the stated reasons and consider an alternative location.",effect:{funds:-5000,credibility:3,legal:-2,energy:-5}},{label:"Prepare volunteer safety",detail:"Map accessibility, crowd safety and emergency routes for any lawful gathering.",effect:{funds:-6000,volunteers:12,energy:-6}}]
   },
   {
+    id:"cjp-campus-safety",date:"2026-09-28",region:"Punjab",title:"Campus safety enters the conversation",
+    fact:"The Times of India reported that Abhijeet Dipke responded to a student video raising concerns about women's safety during unrest at Lovely Professional University. Specific allegations in the video were not independently verified by the report.",
+    scene:"At the historical edge, a student asks the movement to take safety seriously without spreading the video's unverified details. The reported public reaction is fixed; your support work is simulated.",
+    source:"The Times of India",url:"https://timesofindia.indiatimes.com/city/chandigarh/we-have-a-serious-problem-cjp-founder-1st-reaction-on-lpu-unrest-questions-women-safety-on-campus/amp_articleshow/134531719.cms",status:"REPORTED REACTION · CLAIMS UNVERIFIED",
+    choices:[{label:"Share confidential support routes",detail:"Offer students verified channels for private assistance without naming anyone.",effect:{credibility:3,energy:-5}},{label:"Request a factual safety update",detail:"Ask campus authorities for measures taken, without repeating contested allegations.",effect:{credibility:2,media:1,energy:-5}}]
+  },
+  {
     id:'government-2024',date:'2024-06-09',region:'New Delhi',title:'A new Union government takes oath',
     fact:'Narendra Modi and the Council of Ministers were sworn in at Rashtrapati Bhavan on 9 June 2024.',
     scene:'The oath is already history when your story begins. Institutions, incumbents and opposition parties have established positions; a new movement enters this political landscape with no seats.',

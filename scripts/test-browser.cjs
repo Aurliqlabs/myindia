@@ -15,6 +15,7 @@ assert.equal(vm.runInContext('state.historicalRoleplay',context),true);
 vm.runInContext(`state.flags.firstResponse='Help students organise';waitForDispatch();`,context);
 assert.equal(vm.runInContext('state.date',context),'2026-05-16','timeline stops for the first dated movement event');
 assert.ok(vm.runInContext('state.pendingScenes.includes("cjp-founded")',context));
+assert.ok(vm.runInContext('REAL_SCENES.some(x=>x.id==="cjp-campus-safety"&&x.date==="2026-09-28")',context));
 vm.runInContext(`state.date='2026-09-28';state.pendingScenes=[];waitForDispatch();`,context);
 assert.equal(vm.runInContext('state.date',context),'2026-09-29','historical progression stops at the player handoff');
 assert.ok(vm.runInContext('careerDispatchHTML().includes("Choose who leads next")',context));
