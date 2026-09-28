@@ -43,6 +43,42 @@ After that, each route has its own long game:
 - **Civic: national campaigns.** Pick a fictional reform, such as an examination integrity standard or minimum school facilities, and build momentum within 150 days through coalitions, legislator briefings, media and petitions. Published RTI records on the same topic strengthen every move. Momentum fades if you neglect it, and the deadline is fixed. Four reforms can be won.
 - **Electoral: the election calendar.** The Lok Sabha votes in spring 2029 and again in 2034. Between them, each state assembly votes on its own five-year cycle, starting with Uttar Pradesh, Punjab, Uttarakhand, Goa and Manipur in early 2027. Seat counts are real. Dates are projected from the last poll, and every result is simulated. State results build local presence for the general election; win a majority and you form that state's government.
 
+### Injustice in real time
+
+From 20 May 2026, fictional cases arrive in the **injustice feed** on the Home desk while you are busy with everything else: a coaching-centre basement with one exit before the monsoon, a banned cough syrup back on shelves, a young man who died in custody, forty homes marked for demolition with no notice. Each case is modelled on a documented pattern and shows its source. Each has a deadline.
+
+Answer and it costs money, energy and sometimes legal risk, but careful responses produce **evidence**. Ignore it and it ends badly, publicly, and the anger it leaves feeds **public outrage**. Outrage can be channelled into a protest, which brings support and volunteers but carries legal risk unless you have trained marshals, or into a people's report, which builds credibility. Left unchannelled above 85, it spills into unrest that the movement is blamed for.
+
+The Research desk also carries **Before the movement**: sourced records from 2022 to early 2026, covering paper leaks despite a new law, the coaching-centre drownings, contaminated syrup, sewer deaths, custodial deaths, undertrials, court backlogs, demolitions, unpaid wages and anonymous political money. It shows what was already broken when the story begins.
+
+### The network, the courts and the long game
+
+Behind the cases is a **fictional network**: a coaching-chain owner selling exam papers, a drug manufacturer, a contractor-politician, a senior police officer, a state minister, a party treasurer and, hidden above them, the Chairman who pays for it all.
+
+- Evidence from cases and published exposés lets you file a complaint with an investigating agency. Investigations crawl unless the agency is independent. Trials last months, witnesses turn hostile without protection, and verdicts weigh evidence, witnesses, court capacity and how powerful the accused is. Acquittals can be appealed.
+- The network strikes back: office raids that freeze funds, smear campaigns, and bribes offered to your staff. Whether a colleague accepts depends on their hidden integrity and greed. One who refuses brings you evidence; one who accepts leaks your case files.
+- After two convictions, a lieutenant names the Chairman. No agency will investigate him until its independence reaches 60, which takes laws passed in government or reforms won by the civic route. Even when convicted, he appeals to the High Court.
+
+**Nobody is jailed by the player.** Courts decide, and they convict only when evidence, protected witnesses and independent institutions are in place.
+
+### Government
+
+General elections open in spring 2029 and 2034. Win 272 seats for a majority; from 200 seats, regional parties will support a coalition government with a weaker mandate. A government that does not contest the next election leaves office.
+
+In government, nine laws cost political capital (mandate), take weeks in Parliament and can fail: an independent anti-corruption commission, witness protection, fast-track courts, police accountability, exam integrity, school standards, drug safety, wages on time and transparent political funding. Each law strengthens institutions and raises **India's pride index**, a simulated measure of whether the country works for ordinary people, and keeps raising it for its first year.
+
+### Endings
+
+| Ending | How |
+|---|---|
+| **A Republic Restored** | In government, every member of the network convicted, pride index 65 or more |
+| **The Conscience of the Republic** | Civic route: every member convicted and all four national reforms won |
+| **Silenced** | Legal pressure reaches 100 and you are arrested |
+| **The Body Gives Out** | A third collapse from exhaustion |
+| **The Unfinished Republic** | 1 June 2036 arrives, ten years in, with the work not done |
+
+It is meant to be slow and hard. In the balance simulator, a disciplined electoral strategy reaches **A Republic Restored** in 7 of 12 runs, between 2034 and 2036. Unfocused strategies never do. If you keep Dipke's name, the ending is labelled alternate history.
+
 ### Your team
 
 Four founding friends can join as volunteers or paid staff, and you can advertise for more. Candidates show only what an interview reveals. Colleagues have hidden ambition, pride, greed and loyalty. They remember how you treat them, burn out if overworked, and react individually to missed salaries: some leave, some keep working unpaid, some quietly resent it. The best-suited colleague helps with fundraising, recruitment, state visits, research, RTI drafting, petitions, ads and candidate searches, and that work costs them energy.
@@ -64,9 +100,11 @@ Saves stay in your browser. **Settings → Export save** downloads the whole gam
 ```
 index.html
 ├─ data/reality/historical-scenes.js   dated, sourced dispatches (Act 1)
+├─ data/reality/injustice-patterns.js  sourced background records and the fictional cases they inspire
 ├─ src/shared/campaign-rules.js        protest rules shared by browser and engine
 ├─ engine/republic-engine.js           the TypeScript engine, bundled (generated)
-└─ game.js                             GameEngine store, actions and UI
+├─ game.js                             GameEngine store, actions and UI
+└─ act3.js                             injustice feed, outrage, network, courts, laws, pride index, endings
 ```
 
 `game.js` holds one store, `GameEngine`. Its state tree has two parts:
@@ -116,7 +154,7 @@ npm run check:engine   # the committed bundle matches src/
 npm run test:browser   # the browser game with the real engine bundle
 ```
 
-To see how the economy plays out, `npm run sim:balance` runs the real game headlessly for about 18 months with three scripted strategies: a daily grinder, a staff-heavy electoral builder, and a passive player. It prints monthly funds, volunteers, credibility, support and energy, plus when each chapter and election was reached. Run it after changing any costs or rewards.
+To see how the game plays out, `npm run sim:balance -- 3700` runs the real game headlessly for ten years with four scripted strategies: a civic grinder, a staff-heavy electoral builder, a disciplined electoral champion and a passive player. Add `--seeds=12` to see how often each reaches each ending across different random seeds. It prints monthly funds, volunteers, credibility, support and energy, plus when each chapter and election was reached. Run it after changing any costs or rewards.
 
 ## Not yet connected
 

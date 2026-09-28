@@ -10,8 +10,9 @@ function boot(seed){
   // Deterministic Math.random per run so strategies are comparable.
   let s=seed>>>0;context.Math.random=()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296;};
   vm.createContext(context);
-  for(const file of ['data/reality/historical-scenes.js','src/shared/campaign-rules.js','engine/republic-engine.js'])vm.runInContext(fs.readFileSync(file,'utf8'),context);
-  vm.runInContext(fs.readFileSync('game.js','utf8').replace(/init\(\);\s*$/,'')+'\n;this.__g={get state(){return state;},set state(v){state=v;}};',context);
+  for(const file of ['data/reality/historical-scenes.js','data/reality/injustice-patterns.js','src/shared/campaign-rules.js','engine/republic-engine.js'])vm.runInContext(fs.readFileSync(file,'utf8'),context);
+  vm.runInContext(fs.readFileSync('game.js','utf8').replace(/init\(\);\s*$/,''),context);
+  vm.runInContext(fs.readFileSync('act3.js','utf8'),context);
   vm.runInContext('renderIntro=()=>{};show=()=>{};renderGame=()=>{};renderPage=()=>{};toast=()=>{};openHandoff=()=>{state.pendingHandoff=false;};',context);
   return context;
 }
@@ -27,7 +28,9 @@ const STRATEGIES={
   /** Same, but takes on paid staff early and leans on them. */
   builder:{route:'electoral',hire:true},
   /** Only answers dispatches and waits: the lower bound. */
-  passive:{route:'civic',hire:false,passive:true}
+  passive:{route:'civic',hire:false,passive:true},
+  /** Electoral and disciplined: saves for the party, builds seats, and saves the network fight for government. */
+  champion:{route:'electoral',hire:true,champion:true}
 };
 
 function play(name,cfg,seed=7){
@@ -42,10 +45,31 @@ function play(name,cfg,seed=7){
     if(s.pendingScenes.length){run(`botScene(list=>list.reduce((a,b)=>((b.effect.credibility||0)+(b.effect.morale||0))>((a.effect.credibility||0)+(a.effect.morale||0))?b:a))`);continue;}
     if(s.date>run('timelineCutoff()')&&!s.handoff){run(`completeHandoff('Bot','Bot Movement','${cfg.route}')`);mark('handoff');continue;}
     if(s.pendingCrisis){run('resolveCrisis(1)');continue;}
+    if(s.ending){mark('ending:'+s.ending.id);break;}
     if(s.handoff&&run('CAREER_CHAPTERS[state.careerChapter||0]?.done()'))run('advanceChapter()');
     const ch=s.careerChapter||0;if(s.handoff)for(let i=1;i<=ch;i++)mark('chapter'+i);
     if(cfg.passive){run('waitForDispatch()');continue;}
     if(s.player.energy<22){run(`performAction('rest')`);continue;}
+    // Act 3: answer cases (evidence first), channel anger, pursue the network, legislate.
+    const answered=run(`(()=>{for(const x of openInjustices()){const t=INJUSTICE_CASES.find(c=>c.id===x.id);const order=t.responses.map((r,i)=>i).filter(i=>!${cfg.champion?'true':'false'}||state.phase!=='movement'||-(t.responses[i].effect.funds||0)<=3000).sort((a,b)=>(t.responses[b].evidence||0)-(t.responses[a].evidence||0));for(const i of order){try{respondInjustice(x.uid,i);return true;}catch(e){}}}return false;})()`);
+    if(answered)continue;
+    if(s.org.legal>=60&&s.org.funds>=30000){if(run(`botTry(()=>channelOutrage('counsel'))`))continue;}
+    if(s.outrage>=50&&s.org.funds>=10000&&s.player.energy>=12){if(run(`botTry(()=>channelOutrage('protest'))`))continue;}
+    // Save for the general election: in the 90 days before it opens and while it is open, keep ₹60,000 back.
+    const electionDue=s.phase!=='movement'&&run(`(()=>{const e=openElection('general')||nextElection('general');return !!e&&!state.contested[e.id]&&e.opens<=addDays(state.date,90);})()`);
+    const thrifty=cfg.champion&&(s.phase==='movement'||electionDue&&s.org.funds<110000);
+    if(s.handoff&&!thrifty){
+      const act=run(`(()=>{for(const m of NETWORK.filter(memberVisible)){const n=state.network[m.id];
+        if(n.stage==='free'&&n.evidence>=6)try{networkAction('complain',m.id);return true;}catch(e){}
+        if(n.stage==='trial'&&!(n.shieldUntil>state.date)&&state.org.funds>=40000)try{networkAction('protect',m.id);return true;}catch(e){}
+        if(n.stage==='investigation'&&state.org.funds>=60000&&state.day%4===0)try{networkAction('push',m.id);return true;}catch(e){}
+        if(n.stage==='acquitted'&&state.org.funds>=25000)try{networkAction('appeal',m.id);return true;}catch(e){}
+        if(m.id==='chairman'&&state.org.funds>=60000)try{networkAction('audit',m.id);return true;}catch(e){}}
+        if(state.phase==='government')for(const b of BILLS){const x=state.bills[b.id];if(!x?.passedOn&&!x?.voteOn)try{introduceBill(b.id);return true;}catch(e){}}
+        return false;})()`);
+      if(act)continue;
+      if(!thrifty&&s.phase==='government'&&s.org.funds>=150000&&s.lastPhaseActionDay!==s.day){if(run(`botTry(()=>performAction('services'))`))continue;}
+    }
     if(run('Object.keys(state.jantarTasks).length')===13)mark('jantar13');
     // Historical window priorities.
     if(s.date>='2026-05-16'&&s.date<='2026-06-20'&&run('Object.keys(state.jantarTasks).length')<13){
@@ -72,7 +96,8 @@ function play(name,cfg,seed=7){
           if(assembly&&s.player.energy>=10){if(run(`botTry(()=>contestAssembly('${assembly}'))`)){mark('firstAssembly');continue;}}
           const general=run(`openElection('general')?.id`);
           if(general&&!s.contested[general]&&s.campaign.preparation>=30&&s.org.funds>=50000){run(`performAction('election')`);mark('election-'+general);continue;}
-          if(s.campaign.preparation<60&&s.org.funds>=25000&&s.player.energy>=8){if(run(`botTry(()=>performAction('campaign'))`))continue;}
+          const reserve=general||run(`nextElection('general')?.opens<=addDays(state.date,60)`)?50000:0;
+          if((s.campaign.preparation<60||cfg.champion)&&s.org.funds>=25000+reserve&&s.player.energy>=8){if(cfg.champion)run(`state.targetState=Object.entries(SEAT_COUNTS).sort((a,b)=>(state.org.presence[a[0]]||0)/a[1]-(state.org.presence[b[0]]||0)/b[1]||b[1]-a[1])[0][0]`);if(run(`botTry(()=>performAction('campaign'))`))continue;}
         }
       }
       if(s.org.volunteers<500&&s.org.funds>=3000&&s.day%2===0){if(run(`botTry(()=>performAction('recruit'))`))continue;}
@@ -85,10 +110,22 @@ function play(name,cfg,seed=7){
   const final=snapshot(run);
   return {name,milestones,final,timeline,brokeMonths:run(`state.history.filter(h=>/shortfall/i.test(h.title)).length`),resignations:run(`state.history.filter(h=>h.title==='Resignation').length`),
     elections:run('state.elections.map(e=>e.contest+":"+e.seats)'),assemblies:run('state.assemblyResults.map(r=>r.state+" "+r.seats+"/"+r.total)'),reforms:run('state.nationalCampaigns.map(c=>c.id+":"+(c.outcome||"active")+"@"+Math.round(c.progress)+" "+c.startedOn+"→"+(c.closedOn||""))'),jantarDone:run('Object.keys(state.jantarTasks).length'),negotiated:!!run('state.jantarCampaign.negotiation'),
+    ending:run('state.ending?.id??null'),endingDate:run('state.ending?.date??null'),convicted:run('NETWORK.filter(m=>state.network[m.id].stage==="convicted").map(m=>m.id+"@"+state.network[m.id].convictedOn)'),acquitted:run('NETWORK.filter(m=>state.network[m.id].stage==="acquitted").map(m=>m.id)'),pride:run('prideIndex()'),institutions:run('state.institutions'),cases:run('({answered:state.injustices.filter(x=>x.status==="answered").length,ignored:state.injustices.filter(x=>x.status==="ignored").length,total:state.injusticeCount})'),laws:run('Object.keys(state.bills).filter(k=>state.bills[k].passedOn)'),
     peakFunds:Math.max(...timeline.map(t=>t.funds),final.funds),lowEnergyDays:timeline.filter(t=>t.energy<20).length};
 }
-function snapshot(run){return run(`({date:state.date,funds:state.org.funds,volunteers:state.org.volunteers,credibility:state.org.credibility,support:state.support,energy:state.player.energy,stress:state.player.stress,health:state.player.health,job:state.player.jobStanding,money:state.player.money,staff:team().filter(x=>['paid','volunteer','on_leave'].includes(x.status)).length,payroll:GameEngine.api().payrollDue(state.world)})`);}
+function snapshot(run){return run(`({date:state.date,funds:state.org.funds,volunteers:state.org.volunteers,credibility:state.org.credibility,support:state.support,energy:state.player.energy,stress:state.player.stress,health:state.player.health,job:state.player.jobStanding,money:state.player.money,staff:team().filter(x=>['paid','volunteer','on_leave'].includes(x.status)).length,payroll:GameEngine.api().payrollDue(state.world),legal:state.org.legal,outrage:Math.round(state.outrage)})`);}
 
+const seedsArg=process.argv.find(x=>x.startsWith('--seeds='));
+if(seedsArg){
+  // Robustness: how often does each strategy reach each ending across different random seeds?
+  const n=Number(seedsArg.split('=')[1]);
+  for(const [name,cfg] of Object.entries(STRATEGIES).filter(([k])=>k!=='passive')){
+    const tally={};for(let seed=1;seed<=n;seed++){const r=play(name,cfg,seed*7919);const key=r.ending??'none';tally[key]=(tally[key]||0)+1;
+      console.log(name,'seed',seed,r.ending,r.endingDate,'· elections',r.elections.join(' '),'· convicted',r.convicted.length,'· pride',r.pride);}
+    console.log('==',name,JSON.stringify(tally));
+  }
+  process.exit(0);
+}
 const results=Object.entries(STRATEGIES).map(([n,c])=>play(n,c));
 if(process.argv.includes('--json'))console.log(JSON.stringify(results,null,1));
 else for(const r of results){
@@ -96,7 +133,9 @@ else for(const r of results){
   console.log('milestones',JSON.stringify(r.milestones));
   if(r.assemblies.length)console.log('assemblies',r.assemblies.join(' · '));
   if(r.reforms.length)console.log('reforms',r.reforms.join(' · '));
+  console.log('ENDING',r.ending,r.endingDate,'· pride',r.pride,'· institutions',JSON.stringify(r.institutions),'· laws',r.laws.length,'· cases',JSON.stringify(r.cases));
+  console.log('convicted',r.convicted.join(', ')||'none','· acquitted',r.acquitted.join(', ')||'none');
   console.log('jantar tasks',r.jantarDone,'/13 · negotiated',r.negotiated,'· elections',JSON.stringify(r.elections),'· shortfall months',r.brokeMonths,'· resignations',r.resignations,'· peak funds',r.peakFunds);
-  for(const t of r.timeline.filter((_,i)=>i%2===0))console.log(`  ${t.date} funds ${String(t.funds).padStart(8)} vol ${String(t.volunteers).padStart(4)} cred ${String(t.credibility).padStart(3)} sup ${String(t.support).padStart(3)} en ${String(t.energy).padStart(3)} hp ${t.health} job ${t.job} ₹own ${t.money} staff ${t.staff}`);
+  for(const t of r.timeline.filter((_,i)=>i%2===0))console.log(`  ${t.date} funds ${String(t.funds).padStart(8)} vol ${String(t.volunteers).padStart(4)} cred ${String(t.credibility).padStart(3)} sup ${String(t.support).padStart(3)} en ${String(t.energy).padStart(3)} hp ${t.health} job ${t.job} ₹own ${t.money} staff ${t.staff} legal ${t.legal} rage ${t.outrage}`);
   console.log('  final',JSON.stringify(r.final));
 }

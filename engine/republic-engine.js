@@ -1137,6 +1137,7 @@ exports.monthEnd = monthEnd;
 exports.payrollDue = payrollDue;
 exports.teamMoraleShift = teamMoraleShift;
 exports.useStaff = useStaff;
+exports.bribeAttempt = bribeAttempt;
 exports.peopleView = peopleView;
 exports.recruitmentView = recruitmentView;
 exports.executePeopleCommand = executePeopleCommand;
@@ -1235,6 +1236,24 @@ function useStaff(world, skill, intensity = 4) {
         return { bonus: 0 };
     (0, characters_1.workCharacter)(best.c, intensity);
     return { bonus: Math.round((best.score - 25) / 5), id: best.c.id, name: best.c.name };
+}
+/** The network approaches the colleague it judges easiest to buy. Integrity and greed decide; the player only
+ * learns that someone refused, or that a file leaked. */
+function bribeAttempt(world) {
+    const staff = activeStaff(world);
+    if (!staff.length)
+        return null;
+    const rng = (0, rng_1.createRng)(world.rngState);
+    const target = staff.sort((a, b) => (a.psychology.integrity - a.psychology.greed) - (b.psychology.integrity - b.psychology.greed))[0];
+    const accepted = rng.next() < (0, math_1.clamp)((target.psychology.greed - target.psychology.integrity + 30) / 120, 0, .8);
+    world.rngState = rng.state();
+    if (accepted)
+        (0, relationships_1.remember)(world, target.id, "betrayal", 75, "Took money to pass the movement's case files to the network.", { emotionalValence: -30, politicalRelevance: 80 });
+    else {
+        target.morale = (0, math_1.clamp)(target.morale + 5);
+        (0, relationships_1.remember)(world, target.id, "support", 65, "Refused a bribe to betray the movement.", { emotionalValence: 55, politicalRelevance: 60 });
+    }
+    return { id: target.id, name: target.name, accepted };
 }
 function peopleView(world) {
     return Object.values(world.characters).map(c => {
@@ -1335,9 +1354,11 @@ function simulateNationalElection(input) {
     for (const [name, count] of Object.entries(input.seatCounts)) {
         const strength = input.strengthByState[name] ?? 1;
         let won = 0, statePlayer = 0, stateTotal = 0;
+        // Each state has its own political landscape: some are ruling-alliance strongholds, others belong to regional parties.
+        const h = hash(name), ruling = 24 + h % 17, opposition = 18 + (h >>> 5) % 15, regional = 8 + (h >>> 10) % 23;
         for (let i = 0; i < count; i++) {
             const id = `${name}-${i + 1}`;
-            const result = (0, elections_1.simulateConstituency)({ id, name: id, state: name, electorate: 1800000, turnoutBase: 66, partyBaseline: { player: strength, ruling: 31, opposition: 25, regional: 14 }, volatility: 18 }, parties, { nationalSwing: { player: swing }, organisationByParty: { player: 50, ruling: 50, opposition: 50, regional: 50 }, candidateStrength: { [id]: { player: input.candidateQuality?.[name] ?? 45 } } }, rng);
+            const result = (0, elections_1.simulateConstituency)({ id, name: id, state: name, electorate: 1800000, turnoutBase: 66, partyBaseline: { player: strength, ruling, opposition, regional }, volatility: 18 }, parties, { nationalSwing: { player: swing }, organisationByParty: { player: 50, ruling: 50, opposition: 50, regional: 50 }, candidateStrength: { [id]: { player: input.candidateQuality?.[name] ?? 45 } } }, rng);
             if (result.winnerPartyId === "player")
                 won++;
             const votes = Object.values(result.votes).reduce((a, b) => a + b, 0);

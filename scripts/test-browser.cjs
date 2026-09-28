@@ -6,9 +6,11 @@ const saved={};
 const context={console,Date,Math,Intl,localStorage:{setItem:(key,value)=>{saved[key]=value;}},document:{querySelector:()=>({textContent:'',innerHTML:'',style:{},classList:{add(){},remove(){}}})},setTimeout:()=>0,clearTimeout:()=>{}};
 vm.createContext(context);
 vm.runInContext(fs.readFileSync('data/reality/historical-scenes.js','utf8'),context);
+vm.runInContext(fs.readFileSync('data/reality/injustice-patterns.js','utf8'),context);
 vm.runInContext(fs.readFileSync('src/shared/campaign-rules.js','utf8'),context);
 vm.runInContext(fs.readFileSync('engine/republic-engine.js','utf8'),context);
 vm.runInContext(source,context);
+vm.runInContext(fs.readFileSync('act3.js','utf8'),context);
 vm.runInContext(`renderIntro=()=>{};show=()=>{};renderGame=()=>{};startHistoricalGame();`,context);
 assert.equal(vm.runInContext('state.player.name',context),'Abhijeet Dipke');
 assert.equal(vm.runInContext('state.historicalRoleplay',context),true);
@@ -137,7 +139,7 @@ state=vm.runInContext('state',context);
 assert.equal(state.elections[0].seats,0,'low-support party must be able to lose all seats');
 assert.equal(state.phase,'party','zero seats must not unlock parliamentary opposition actions');
 assert.ok(vm.runInContext('careerObjectiveHTML()',context).includes('Rebuild after election night'),'a losing career needs a clear next objective');
-vm.runInContext(`state.pendingScenes=[];state.pendingCrisis=null;state.pendingTip={rivalId:'test',offeredOn:'2026-09-30'};state.phase='party';state.date='2026-10-02';const beforeWaitDay=state.day;waitForDispatch();`,context);
+vm.runInContext(`var realSpawn=spawnInjustice;spawnInjustice=()=>{};state.injustices=[];state.pendingScenes=[];state.pendingCrisis=null;state.pendingTip={rivalId:'test',offeredOn:'2026-09-30'};state.phase='party';state.date='2026-10-02';const beforeWaitDay=state.day;waitForDispatch();spawnInjustice=realSpawn;`,context);
 state=vm.runInContext('state',context);
 assert.equal(state.date,'2026-11-01','future waiting may cover a month when no new alert arrives');
 assert.equal(state.day-vm.runInContext('beforeWaitDay',context),30,'future wait must still process each calendar day');
@@ -283,4 +285,38 @@ vm.runInContext(`activeCampaign().progress=99;state.player.energy=90;campaignAct
 assert.equal(vm.runInContext('state.nationalCampaigns[0].outcome',context),'adopted');
 vm.runInContext(`campaignAction('launch','water-disclosure');const c=activeCampaign();while(state.date<c.deadline)advanceDay();`,context);
 assert.equal(vm.runInContext('state.nationalCampaigns[0].outcome',context),'stalled','the deadline closes an unfinished campaign');
-console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar and campaign checks passed.');
+
+// Act 3: every fictional case follows a sourced background record.
+assert.ok(vm.runInContext('INJUSTICE_CASES.every(c=>BEFORE_THE_MOVEMENT.some(b=>b.id===c.pattern)&&c.responses.length>=2&&c.ignored.text)',context));
+assert.ok(vm.runInContext('BEFORE_THE_MOVEMENT.every(b=>b.date===undefined&&b.year<=2026&&/^https:\\/\\//.test(b.url))',context),'background records are sourced and predate the story');
+assert.ok(vm.runInContext('INJUSTICE_CASES.filter(c=>c.lead).every(c=>NETWORK.some(m=>m.id===c.lead))',context),'every lead points at a network member');
+// The feed: cases arrive, answered ones yield evidence, ignored ones hurt and feed outrage.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-10-01';state.pendingScenes=[];completeHandoff('Bot','Watch','civic');state.org.funds=300000;state.player.energy=100;for(let i=0;i<40&&openInjustices().length<2;i++){state.player.energy=100;advanceDay();}`,context);
+assert.ok(vm.runInContext('openInjustices().length',context)>=1,'injustice cases arrive over time');
+const inj=vm.runInContext('(()=>{const x=openInjustices()[0];return {uid:x.uid,lead:INJUSTICE_CASES.find(c=>c.id===x.id).lead,i:INJUSTICE_CASES.find(c=>c.id===x.id).responses.findIndex(r=>r.evidence)};})()',context);
+if(inj.lead&&inj.i>=0){const before=vm.runInContext(`state.network["${inj.lead}"].evidence`,context);vm.runInContext(`respondInjustice("${inj.uid}",${inj.i})`,context);assert.ok(vm.runInContext(`state.network["${inj.lead}"].evidence`,context)>before,'a careful response yields evidence');}
+vm.runInContext(`state.injustices.filter(x=>x.status==='open').forEach(x=>x.dueOn=state.date);var outrageBefore=state.outrage;var openBefore=openInjustices().length;`,context);
+if(vm.runInContext('openBefore',context)>0){vm.runInContext('advanceDay()',context);assert.ok(vm.runInContext('state.injustices.some(x=>x.status==="ignored")&&state.outrage>outrageBefore-1',context),'ignored cases close badly and feed outrage');}
+// Outrage can be channelled; unchannelled it risks unrest.
+vm.runInContext(`state.outrage=60;state.org.volunteers=300;state.org.legal=10;state.player.energy=90;var sup=state.support;channelOutrage('protest');`,context);
+assert.ok(vm.runInContext('state.support>sup&&state.outrage<=21',context),'a protest turns outrage into support');
+assert.throws(()=>vm.runInContext(`channelOutrage('protest')`,context),/not high enough/);
+// The network: complaint, investigation, trial, verdict; the Chairman is out of reach until institutions change.
+vm.runInContext(`state.network.sood.evidence=12;networkAction('complain','sood');`,context);
+assert.equal(vm.runInContext('state.network.sood.stage',context),'investigation');
+vm.runInContext(`state.institutions={agency:90,courts:90,protection:90};for(let i=0;i<800&&!['convicted','acquitted'].includes(state.network.sood.stage);i++){state.player.energy=100;state.player.health=100;state.org.legal=0;advanceDay();}`,context);
+assert.ok(['convicted','acquitted'].includes(vm.runInContext('state.network.sood.stage',context)),'investigations lead to a verdict');
+vm.runInContext(`state.network.chairman.revealed=true;state.network.chairman.evidence=20;state.institutions.agency=40;`,context);
+assert.throws(()=>vm.runInContext(`networkAction('complain','chairman')`,context),/independence reaches 60/,'the Chairman needs an independent agency');
+// Government: bills change institutions and the pride index.
+vm.runInContext(`state.phase='government';state.governance.mandate=90;state.elections.unshift({seats:320});state.org.funds=500000;var inst=state.institutions.protection;introduceBill('witness');state.bills.witness.voteOn=state.date;var realRoll=roll;roll=()=>0;advanceDay();roll=realRoll;`,context);
+assert.ok(vm.runInContext('state.bills.witness.passedOn&&state.institutions.protection>inst',context),'a passed bill strengthens institutions');
+// Endings: victory needs government, the Chairman convicted and a pride index of 70.
+vm.runInContext(`state.ending=null;state.network.chairman.stage='convicted';state.network.chairman.sentence=12;state.network.chairman.convictedOn=state.date;for(const k in state.pride)state.pride[k]=66;checkEndings();`,context);
+assert.equal(vm.runInContext('state.ending',context),null,'victory needs the whole network behind bars');
+vm.runInContext(`for(const m of NETWORK){state.network[m.id].stage='convicted';state.network[m.id].sentence??=5;}checkEndings();`,context);
+assert.equal(vm.runInContext('state.ending.id',context),'restored');
+assert.ok(vm.runInContext('endingStory().lines.join(" ")',context).includes('Chairman'),'the ending tells the story');
+vm.runInContext(`state.ending=null;state.org.legal=100;checkEndings();`,context);
+assert.equal(vm.runInContext('state.ending.id',context),'arrested','unchecked legal pressure ends the story');
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar, campaign and Act 3 checks passed.');

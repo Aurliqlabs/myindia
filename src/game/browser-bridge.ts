@@ -110,6 +110,19 @@ export function useStaff(world:WorldState,skill:StaffSkillKey,intensity=4):{bonu
   return {bonus:Math.round((best.score-25)/5),id:best.c.id,name:best.c.name};
 }
 
+/** The network approaches the colleague it judges easiest to buy. Integrity and greed decide; the player only
+ * learns that someone refused, or that a file leaked. */
+export function bribeAttempt(world:WorldState):{id:string;name:string;accepted:boolean}|null {
+  const staff=activeStaff(world);if(!staff.length)return null;
+  const rng=createRng(world.rngState);
+  const target=staff.sort((a,b)=>(a.psychology.integrity-a.psychology.greed)-(b.psychology.integrity-b.psychology.greed))[0];
+  const accepted=rng.next()<clamp((target.psychology.greed-target.psychology.integrity+30)/120,0,.8);
+  world.rngState=rng.state();
+  if(accepted)remember(world,target.id,"betrayal",75,"Took money to pass the movement's case files to the network.",{emotionalValence:-30,politicalRelevance:80});
+  else{target.morale=clamp(target.morale+5);remember(world,target.id,"support",65,"Refused a bribe to betray the movement.",{emotionalValence:55,politicalRelevance:60});}
+  return {id:target.id,name:target.name,accepted};
+}
+
 export interface PersonView {
   id:string; name:string; role:string; background:string; homeState:string; founding:boolean;
   status:"available"|"volunteer"|"paid"|"on_leave"|"former"; salaryMonthly:number; suggestedRole:OrgRole; suggestedRoleTitle:string;
@@ -207,9 +220,11 @@ export function simulateNationalElection(input:NationalElectionInput):NationalEl
   const byState:NationalElectionResult["byState"]={};let seats=0,playerVotes=0,totalVotes=0,turnoutSum=0,seatTotal=0;
   for(const [name,count] of Object.entries(input.seatCounts)){
     const strength=input.strengthByState[name]??1;let won=0,statePlayer=0,stateTotal=0;
+    // Each state has its own political landscape: some are ruling-alliance strongholds, others belong to regional parties.
+    const h=hash(name),ruling=24+h%17,opposition=18+(h>>>5)%15,regional=8+(h>>>10)%23;
     for(let i=0;i<count;i++){
       const id=`${name}-${i+1}`;
-      const result=simulateConstituency({id,name:id,state:name,electorate:1800000,turnoutBase:66,partyBaseline:{player:strength,ruling:31,opposition:25,regional:14},volatility:18},
+      const result=simulateConstituency({id,name:id,state:name,electorate:1800000,turnoutBase:66,partyBaseline:{player:strength,ruling,opposition,regional},volatility:18},
         parties,{nationalSwing:{player:swing},organisationByParty:{player:50,ruling:50,opposition:50,regional:50},candidateStrength:{[id]:{player:input.candidateQuality?.[name]??45}}},rng);
       if(result.winnerPartyId==="player")won++;
       const votes=Object.values(result.votes).reduce((a,b)=>a+b,0);

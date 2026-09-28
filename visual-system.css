@@ -324,3 +324,20 @@ button:active:not(:disabled){filter:brightness(.9)}
 .campaign-card{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding:16px;background:#292d2f;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:4px}
 .campaign-card>small{color:var(--gold);font-size:11px;font-weight:650;letter-spacing:.02em}
 .campaign-card>strong{font-size:20px;color:var(--ink)}.campaign-card>p{margin:0}
+
+/* Act 3: injustice feed, outrage, network, endings */
+.injustice-feed{margin-bottom:16px;border-top:3px solid var(--red)}
+.injustice-card{margin-top:14px;padding:16px;background:#2a2322;border:1px solid #5a3431;border-left:4px solid var(--red);border-radius:4px}
+.injustice-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:650;color:#e9b3ad;text-transform:uppercase;letter-spacing:.04em}
+.injustice-top b{color:var(--gold)}.injustice-top b.urgent{color:#fff;background:var(--red);padding:1px 7px;border-radius:var(--radius-tag)}
+.injustice-card h3{margin:6px 0;font-size:20px;color:var(--ink)}.injustice-card>p{margin:0 0 8px;color:#e6ddd2}
+.injustice-pattern{font-size:12px;color:#b9aea4!important;border-left:2px solid #5a3431;padding-left:8px}.injustice-pattern a{color:var(--gold)}
+.injustice-feed .history-list .ignored{border-left-color:#7a2622;background:#2a2020}
+.injustice-feed .history-list .answered{border-left-color:var(--green)}
+.outrage-meter{margin-top:8px}.outrage-fill{background:linear-gradient(90deg,#e6ad68,#d63e3a)}
+.network-card.convicted{border-color:var(--green);opacity:.85}.network-card.trial{border-color:var(--gold)}.network-card.investigation{border-color:var(--orange)}
+.ending-screen{z-index:60}.ending-box{max-width:720px}.ending-box h2{font-size:clamp(28px,5vw,44px)}
+.ending-screen.victory .ending-box{border-top:4px solid var(--gold)}.ending-screen.defeat .ending-box{border-top:4px solid var(--red)}
+.ending-box>p{font-size:16px;line-height:1.6}.ending-note{font-size:12px!important;color:var(--muted)!important}
+.legal-warning{margin:10px 0 14px;padding:12px 14px;background:#35211f;border:1px solid #7a2622;border-left:4px solid var(--red);border-radius:4px}
+.legal-warning strong{color:#f0a39c}.legal-warning p{margin:4px 0 0;font-size:13px;color:#e6ddd2}
