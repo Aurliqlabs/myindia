@@ -24,6 +24,7 @@ assert.equal(vm.runInContext('state.player.name',context),'Johnson');
 assert.equal(vm.runInContext('state.org.name',context),'New movement');
 assert.equal(vm.runInContext('state.careerChapter',context),1);
 vm.runInContext(`state={date:'2026-05-14',day:1,phase:'movement',player:{name:'Test',energy:82,stress:20},org:{funds:12000,credibility:50,media:0,legal:0},support:20};ensureState();renderPage=()=>{};civicAction('water','verify');civicAction('water','support');civicAction('water','publish');`,context);
+assert.equal(vm.runInContext('timelineCutoff()',context),'2026-09-25','earlier saves keep their original simulation boundary');
 assert.equal(vm.runInContext('state.civicCases.water.outcome',context),'Sourced public briefing');
 assert.equal(vm.runInContext('state.org.funds',context),7000);
 assert.throws(()=>vm.runInContext("civicAction('water','rage')",context),/closed/);
