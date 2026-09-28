@@ -1,0 +1,7 @@
+# Keep Windows checkout line endings consistent for the browser source and tests.
+* text=auto eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary

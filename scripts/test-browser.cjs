@@ -308,7 +308,9 @@ assert.equal(vm.runInContext('state.network.sood.stage',context),'investigation'
 vm.runInContext(`state.institutions={agency:90,courts:90,protection:90};for(let i=0;i<800&&!['convicted','acquitted'].includes(state.network.sood.stage);i++){state.player.energy=100;state.player.health=100;state.org.legal=0;advanceDay();}`,context);
 assert.ok(['convicted','acquitted'].includes(vm.runInContext('state.network.sood.stage',context)),'investigations lead to a verdict');
 vm.runInContext(`state.network.chairman.revealed=true;state.network.chairman.evidence=20;state.institutions.agency=40;`,context);
-assert.throws(()=>vm.runInContext(`networkAction('complain','chairman')`,context),/independence reaches 70/,'the Chairman needs an independent agency');
+assert.throws(()=>vm.runInContext(`networkAction('complain','chairman')`,context),/independence reaches 61/,'the Chairman needs an independent agency');
+vm.runInContext(`state.institutions.agency=25;for(const id of Object.keys(CIVIC_REFORM_EFFECTS))onReformAdopted(id);`,context);
+assert.equal(vm.runInContext('state.institutions.agency',context),vm.runInContext('CHAIRMAN_AGENCY_THRESHOLD',context),'a complete civic route reaches the Chairman threshold without government');
 // Government: bills change institutions and the pride index.
 vm.runInContext(`state.phase='government';state.governance.mandate=90;state.elections.unshift({seats:320});state.org.funds=500000;var inst=state.institutions.protection;introduceBill('witness');state.bills.witness.voteOn=state.date;var realRoll=roll;roll=()=>0;advanceDay();roll=realRoll;`,context);
 assert.ok(vm.runInContext('state.bills.witness.passedOn&&state.institutions.protection>inst',context),'a passed bill strengthens institutions');
@@ -331,6 +333,10 @@ assert.ok(vm.runInContext('state.day-stop<=28',context));
 assert.ok(vm.runInContext('state.lastCaseOn===state.date||state.day-stop===28',context),'a new case stops the routine on the day it arrives');
 vm.runInContext(`state.pendingScenes=['exam-remark'];`,context);
 assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits while a dispatch is unanswered');
+vm.runInContext(`state.pendingScenes=[];state.operationFollowups=[{id:'review-test',name:'Test operation',dueDay:state.day,approach:'listen'}];`,context);
+assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits for a completed operation report');
+vm.runInContext(`fileOperationReview('review-test','audit');`,context);
+assert.equal(vm.runInContext('state.operationFollowups.length',context),0,'filing a report clears its routine blocker');
 
 // Asking before acting: world-changing clicks always ask; navigation, pickers and story buttons do not.
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
@@ -338,8 +344,20 @@ assert.equal(vm.runInContext(`needsConfirmation('people',{action:'release'})`,co
 assert.equal(vm.runInContext(`needsConfirmation('go',{page:'home'})||needsConfirmation('pick',{})||needsConfirmation('talk',{})`,context),false);
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'advance-week'})`,context),true,'time advancement is a consequential confirmation');
 vm.runInContext(`state.settings={confirm:false};`,context);
-assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),false,'the setting turns confirmations off');
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),true,'a one-way decision always confirms');
 vm.runInContext(`state.settings={};`,context);
+// An editorial bonus is settled only after the selected action can actually be paid for.
+vm.runInContext(`state={date:'2026-10-01',day:1,phase:'movement',player:{name:'Test',energy:50,stress:10},org:{funds:0,credibility:45,media:0,legal:0},support:20};ensureState();state.lastMediaPlan={date:state.date,kind:'briefing',angle:'facts'};performAction('briefing');`,context);
+assert.equal(vm.runInContext('state.org.credibility',context),45,'an unaffordable media action cannot grant its editorial bonus');
+assert.equal(vm.runInContext('state.day',context),1,'an unaffordable media action cannot advance the day');
+assert.ok(vm.runInContext('state.lastMediaPlan',context),'the player can return to a brief that was not committed');
+vm.runInContext(`delete state.settings;delete state.candidateInterviewQuestion;delete state.lastMediaPlan;delete state.operationPlans;delete state.operationFollowups;delete state.donorFatigue;ensureState();`,context);
+assert.equal(vm.runInContext(`state.settings.confirm`,context),true,'old saves receive interactive-state defaults');
+assert.equal(vm.runInContext(`state.operationPlans.length+state.operationFollowups.length+state.donorFatigue`,context),0,'old saves receive safe empty interactive collections');
+vm.runInContext(`startHistoricalGame();state.date='2026-09-29';state.pendingScenes=[];`,context);
+assert.throws(()=>vm.runInContext(`completeHandoff('Bad <name>','Watch','civic')`,context),/valid name/,'handoff names cannot inject markup');
+assert.ok(source.includes('cx="${cx}" cy="${cy}"'),'field-map markers write valid SVG coordinates directly');
+assert.ok(source.includes('custom-game-btn')&&source.includes('show("creator-screen")'),'the citizen creator is reachable from the intro');
 // Stale historical dispatches close themselves after three weeks instead of piling up.
 vm.runInContext(`state.date='2026-09-01';state.pendingScenes=['cjp-pressure-group','cjp-eci-demand'];expireStaleScenes();`,context);
 assert.equal(vm.runInContext('state.pendingScenes.join()',context),'cjp-eci-demand','only dispatches older than 21 days expire');
