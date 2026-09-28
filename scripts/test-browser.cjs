@@ -11,6 +11,7 @@ vm.runInContext(fs.readFileSync('src/shared/campaign-rules.js','utf8'),context);
 vm.runInContext(fs.readFileSync('engine/republic-engine.js','utf8'),context);
 vm.runInContext(source,context);
 vm.runInContext(fs.readFileSync('act3.js','utf8'),context);
+vm.runInContext(fs.readFileSync('ui.js','utf8'),context);
 vm.runInContext(`renderIntro=()=>{};show=()=>{};renderGame=()=>{};startHistoricalGame();`,context);
 assert.equal(vm.runInContext('state.player.name',context),'Abhijeet Dipke');
 assert.equal(vm.runInContext('state.historicalRoleplay',context),true);

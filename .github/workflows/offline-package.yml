@@ -25,6 +25,7 @@ jobs:
             index.html
             game.js
             act3.js
+            ui.js
             engine/
             styles.css
             data/
