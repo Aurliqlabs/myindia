@@ -270,13 +270,14 @@ function waitForDispatch(){
  if(state.pendingScenes.length)return toast("Respond to the historical dispatch first.");
  if(state.pendingCrisis)return toast("Respond to the national crisis first.");
  let days=0;
- const limit=state.date>REALITY_CUTOFF?30:180;
+ const startedHistorical=state.date<=REALITY_CUTOFF;
+ const limit=startedHistorical?180:30;
  while(days<limit){
    state.player.energy=clamp(state.player.energy+3);
    state.player.stress=clamp(state.player.stress-1);
    advanceDay();
    days++;
-   if(state.pendingScenes.length||state.pendingCrisis||state.date>REALITY_CUTOFF||state.pendingTip?.offeredOn===state.date)break;
+   if(state.pendingScenes.length||state.pendingCrisis||(startedHistorical&&state.date>REALITY_CUTOFF)||state.pendingTip?.offeredOn===state.date)break;
  }
  record("Time passes",`${days} day${days===1?"":"s"} passed between field decisions. Daily actions were missed.`);
  save();renderGame();
