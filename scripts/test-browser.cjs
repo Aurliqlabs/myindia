@@ -7,6 +7,7 @@ const context={console,Date,Math,Intl,localStorage:{setItem:(key,value)=>{saved[
 vm.createContext(context);
 vm.runInContext(fs.readFileSync('data/reality/historical-scenes.js','utf8'),context);
 vm.runInContext(fs.readFileSync('src/shared/campaign-rules.js','utf8'),context);
+vm.runInContext(fs.readFileSync('src/shared/people-rules.js','utf8'),context);
 vm.runInContext(source,context);
 vm.runInContext(`state={date:'2026-06-06',day:1,phase:'movement',player:{name:'Test',energy:82,health:92,stress:24,level:1,recognition:11},org:{funds:42000,volunteers:136,staff:0,credibility:52,media:18,legal:8},support:22,general:5,followers:14300,operationProgress:18};renderGame=()=>{};ensureState();startProject('campus');`,context);
 let state=vm.runInContext('state',context);
@@ -104,6 +105,10 @@ vm.runInContext(`state.pendingScenes=[];state.pendingCrisis=null;state.pendingTi
 state=vm.runInContext('state',context);
 assert.equal(state.date,'2026-11-01','future waiting may cover a month when no new alert arrives');
 assert.equal(state.day-vm.runInContext('beforeWaitDay',context),30,'future wait must still process each calendar day');
-console.log('Browser campaign, audit, timeline and election checks passed.');
+const peopleRules=require('../src/shared/people-rules.js');
+let wellbeing={energy:8,stress:55,morale:70,employed:true};let leave;
+for(let day=14;day<21&&!leave;day++){const next=peopleRules.dailyWellbeing(wellbeing,`2026-05-${day}`,()=>.5);wellbeing={...wellbeing,...next};if(next.forcedLeave)leave=next.onLeaveUntil;}
+assert.ok(leave,'shared staff wellbeing must trigger leave after sustained exhaustion');
+console.log('Browser campaign, audit, timeline, election and staff checks passed.');
 
 

@@ -5,36 +5,29 @@ import { assignRole } from "./characters";
 import { nextRoleUp, roleLevel, ROLE_PROFILES } from "./roles";
 import { makeWorldId } from "./id";
 import { Rng } from "./rng";
+import { dailyWellbeing } from "../shared/people-rules";
 
 function logCareerEvent(world:WorldState,characterId:string,type:CareerEvent["type"],note:string):void {
   world.characterEvents.push({id:makeWorldId(world,"career"),characterId,date:world.date,type,note});
   if(world.characterEvents.length>3000)world.characterEvents.splice(0,world.characterEvents.length-3000);
 }
 
-/** Daily wellbeing tick: sustained exhaustion accumulates into forced leave; high stress risks visible mistakes. */
+/** The browser and core use the same daily wellbeing rule. The core records its consequences as memory and career events. */
 export function dailyCharacterTick(world:WorldState,c:CharacterState,rng:Rng):void {
   if(!c.employed)return;
-  if(c.onLeaveUntil&&world.date<c.onLeaveUntil)return;
-  if(c.onLeaveUntil&&world.date>=c.onLeaveUntil)c.onLeaveUntil=undefined;
-
-  c.energy=clamp(c.energy-1.2-c.stress*.006);
-  c.stress=clamp(c.stress+.25);
-  c.burnoutStreak=c.energy<20?(c.burnoutStreak??0)+1:0;
-  if(c.energy<15)c.morale=clamp(c.morale-.8);
-
-  if(c.stress>72&&rng.next()<.03){
-    c.morale=clamp(c.morale-3);world.organisation.credibility=clamp(world.organisation.credibility-.5);
+  const update=dailyWellbeing(c,world.date,()=>rng.next());
+  c.energy=update.energy;c.stress=update.stress;c.morale=update.morale;
+  c.burnoutStreak=update.burnoutStreak;c.onLeaveUntil=update.onLeaveUntil;
+  if(update.mistake){
+    world.organisation.credibility=clamp(world.organisation.credibility-.5);
     logCareerEvent(world,c.id,"mistake","A stress-driven mistake affected the team's work.");
   }
-  if((c.burnoutStreak??0)>=6){
-    c.onLeaveUntil=addDays(world.date,3+Math.round(rng.next()*3));
-    c.energy=clamp(c.energy+28);c.stress=clamp(c.stress-18);c.burnoutStreak=0;
+  if(update.forcedLeave){
     remember(world,c.id,"burnout",65,"Burned out and took forced leave.",{emotionalValence:-40});
     logCareerEvent(world,c.id,"burnout_leave",`Took leave until ${c.onLeaveUntil}.`);
   }
 }
 
-function addDays(date:string,days:number):string{const d=new Date(date+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
 function monthsBetween(a:string,b:string):number{const d1=new Date(a+"T00:00:00Z"),d2=new Date(b+"T00:00:00Z");return(d2.getUTCFullYear()-d1.getUTCFullYear())*12+(d2.getUTCMonth()-d1.getUTCMonth());}
 
 /** How much of their skill set a character brings to their current role; used to judge whether they have outgrown it. */
