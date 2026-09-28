@@ -201,3 +201,64 @@ button:disabled{opacity:.45;cursor:not-allowed}
 /* Motion is intentionally paused until the interaction direction is chosen. */
 *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 .nav-btn:hover,.dispatch-action:hover:not(:disabled),.primary-brush:hover:not(:disabled),.secondary-brush:hover:not(:disabled),.management-actions button:hover:not(:disabled),.project-card button:hover:not(:disabled),.historical-alert button:hover:not(:disabled),.archive-action:hover:not(:disabled),.action-btn:hover,.choice:hover,.trait:hover,button:active:not(:disabled){transform:none!important}
+
+/* Rapid color growth is reserved for interactive controls; panels stay still. */
+.primary-brush:not(:disabled),
+.management-actions button:not(:disabled),
+.project-card button:not(:disabled),
+.historical-alert button:not(:disabled),
+.archive-action:not(:disabled){
+  background-image:linear-gradient(90deg,var(--gold),var(--gold))!important;
+  background-repeat:no-repeat!important;
+  background-size:0% 100%!important;
+  transition:background-size 170ms cubic-bezier(.15,.85,.25,1),color 170ms,border-color 170ms!important;
+}
+.primary-brush:hover:not(:disabled),
+.management-actions button:hover:not(:disabled),
+.project-card button:hover:not(:disabled),
+.historical-alert button:hover:not(:disabled),
+.archive-action:hover:not(:disabled){
+  background-image:linear-gradient(90deg,var(--gold),var(--gold))!important;
+  background-size:100% 100%!important;
+  border-color:var(--gold);
+  color:#211b15;
+}
+.dispatch-action:not(:disabled){
+  background-image:linear-gradient(90deg,#442022,#442022)!important;
+  background-repeat:no-repeat!important;
+  background-size:0% 100%!important;
+  transition:background-size 170ms cubic-bezier(.15,.85,.25,1),color 170ms,border-color 170ms!important;
+}
+.dispatch-action:hover:not(:disabled){
+  background-image:linear-gradient(90deg,#442022,#442022)!important;
+  background-size:100% 100%!important;
+  border-color:#fff0cf;
+  color:#fff8ee;
+}
+.action-btn:not(:disabled),.choice:not(:disabled),.trait:not(.selected):not(:disabled),.nav-btn:not(.active){
+  background-image:linear-gradient(90deg,#493132,#493132)!important;
+  background-repeat:no-repeat!important;
+  background-size:0% 100%!important;
+  transition:background-size 150ms ease-out,border-color 150ms,color 150ms!important;
+}
+.action-btn:hover:not(:disabled),.choice:hover:not(:disabled),.trait:not(.selected):hover:not(:disabled),.nav-btn:not(.active):hover{
+  background-image:linear-gradient(90deg,#493132,#493132)!important;
+  background-size:100% 100%!important;
+  border-color:var(--gold);
+  color:var(--ink);
+}
+.nav-btn:not(.active):hover .nav-icon{color:var(--gold)}
+button:active:not(:disabled){filter:brightness(.9)}
+@media(prefers-reduced-motion:reduce){button{transition:none!important}}
+
+.secondary-brush:not(:disabled),.modal-close:not(:disabled){
+  background-image:linear-gradient(90deg,var(--gold),var(--gold))!important;
+  background-repeat:no-repeat!important;
+  background-size:0% 100%!important;
+  transition:background-size 170ms ease-out,color 170ms!important;
+}
+.secondary-brush:hover:not(:disabled),.modal-close:hover:not(:disabled){
+  background-image:linear-gradient(90deg,var(--gold),var(--gold))!important;
+  background-size:100% 100%!important;
+  color:#211b15;
+}
