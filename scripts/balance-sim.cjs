@@ -111,6 +111,8 @@ function play(name,cfg,seed=7){
       if(s.support<35&&s.org.funds>=12000&&s.player.energy>=12&&!s.projects.some(p=>p.status==='active')){if(run(`botTry(()=>startProject('doorstep'))`))continue;}
       if(s.support<35&&s.org.funds>=5000&&s.day%3===0){if(run(`botTry(()=>performAction('briefing'))`))continue;}
     }
+    const fieldIncident=run('dueFieldIncident()');
+    if(fieldIncident){if(fieldIncident.incidentId)run(`resolveFieldIncidentFollowup(${JSON.stringify(fieldIncident.id)},'keep-word')`);else run(`resolveFieldIncident(${JSON.stringify(fieldIncident.id)},${JSON.stringify(run(`FIELD_INCIDENTS[${JSON.stringify(fieldIncident.kind)}].choices[0].id`))})`);continue;}
     if((s.operationFollowups||[]).some(x=>x.dueDay<=s.day)){const review=s.operationFollowups.find(x=>x.dueDay<=s.day);run(`fileOperationReview(${JSON.stringify(review.id)},'audit')`);continue;}
     if(cfg.routine&&s.flags.firstResponse&&s.date>='2026-05-16'){if(s.phase!=='movement')s.routine.tours=2;run(`advanceWithRoutine(7)`);continue;}
     if(run(`botTry(()=>performAction('fundraise'))`))continue;

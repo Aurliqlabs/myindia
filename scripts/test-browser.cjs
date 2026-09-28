@@ -344,6 +344,11 @@ vm.runInContext(`var incident=dueFieldIncident();resolveFieldIncident(incident.i
 assert.ok(vm.runInContext('dueFieldIncident()?.incidentId',context),'the initial field choice returns as a later follow-up');
 vm.runInContext(`resolveFieldIncidentFollowup(dueFieldIncident().id,'keep-word');`,context);
 assert.equal(vm.runInContext('!!dueFieldIncident()',context),false,'the field follow-up resolves cleanly');
+// Growth is simulated weekly: volunteers become committed members and sustained presence forms chapters.
+vm.runInContext(`state={date:'2026-10-07',day:7,phase:'movement',player:{name:'Test',energy:70,stress:10},org:{name:'Watch',funds:50000,credibility:70,media:0,legal:0,volunteers:300,presence:{Kerala:18,Punjab:18,Delhi:18}},support:20,flags:{firstResponse:'Organise'}};ensureState();organisationGrowthWeekly();`,context);
+assert.equal(vm.runInContext('state.org.members',context),18,'weekly growth converts a bounded share of volunteers into members');
+assert.equal(vm.runInContext('organisationGrowth().chapters',context),3,'sustained local presence becomes chapters');
+assert.ok(vm.runInContext('state.history.some(x=>x.title==="Organisation milestone")',context),'growth stages generate a gameplay milestone');
 
 // Asking before acting: world-changing clicks always ask; navigation, pickers and story buttons do not.
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
