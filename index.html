@@ -3,29 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#17191b" />
   <title>REPUBLIC: 543</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="visual-system.css" />
 </head>
 <body>
   <div id="app" class="app-shell">
     <section id="start-screen" class="start-screen">
       <div class="paper-noise"></div>
-      <div class="start-topline"><span>POLITICS. PEOPLE. POWER.</span><span>INDIA PLAYS TOO.</span></div>
+      <div class="start-topline"><span>Politics. People. Power.</span><span>India plays too.</span></div>
       <div class="start-content">
         <div class="logo-lockup">
           <span class="logo-republic">REPUBLIC</span>
           <span class="logo-543">543</span>
         </div>
         <p class="start-kicker">A political life simulation</p>
-        <h1>ENTER A MOVEMENT.<br><em>SHAPE ITS FUTURE.</em></h1>
+        <h1>Enter a movement.<br><em>Shape its future.</em></h1>
         <p class="start-copy">Follow the real CJP timeline through 25 September 2026. Join as a fictional organiser and decide what happens next.</p>
         <div class="start-actions">
-          <button id="new-game-btn" class="primary-brush">NEW GAME <span>→</span></button>
-          <button id="continue-btn" class="secondary-brush" disabled>CONTINUE</button>
+          <button id="new-game-btn" class="primary-brush">New game <span>→</span></button>
+          <button id="continue-btn" class="secondary-brush" disabled>Continue</button>
         </div>
       </div>
       <div class="start-footer"><span>26 SEP 2026 HANDOFF</span><span>543 LOK SABHA SEATS</span><span>10-YEAR CAREER</span></div>
@@ -35,7 +36,7 @@
       <div class="creator-card">
         <div class="creator-head">
           <button id="creator-back" class="icon-btn" aria-label="Back">←</button>
-          <div><small>NEW CAREER</small><h2>CREATE YOURSELF</h2></div>
+          <div><small>NEW CAREER</small><h2>Create yourself</h2></div>
           <span class="step-chip">CITIZEN PROFILE</span>
         </div>
         <form id="creator-form">
@@ -51,7 +52,7 @@
             <div class="section-label"><span>CHOOSE YOUR EDGE</span><small>Every advantage creates a weakness.</small></div>
             <div id="trait-grid" class="trait-grid"></div><div class="section-label"><span>ALLOCATE UP TO 12 SKILL POINTS</span><small>Each attribute changes decisions in the simulation.</small></div><div class="form-grid"><label><span>COMMUNICATION</span><input id="skill-communication" type="number" min="0" max="12" value="0" /></label><label><span>STRATEGY</span><input id="skill-strategy" type="number" min="0" max="12" value="0" /></label><label><span>ANALYSIS</span><input id="skill-analysis" type="number" min="0" max="12" value="0" /></label><label><span>LEADERSHIP</span><input id="skill-leadership" type="number" min="0" max="12" value="0" /></label><label><span>NEGOTIATION</span><input id="skill-negotiation" type="number" min="0" max="12" value="0" /></label><label><span>COURAGE</span><input id="skill-courage" type="number" min="0" max="12" value="0" /></label></div>
           </div>
-          <button class="primary-brush full" type="submit">BEGIN THE STORY <span>→</span></button>
+          <button class="primary-brush full" type="submit">Begin the story <span>→</span></button>
         </form>
       </div>
     </section>
@@ -81,14 +82,14 @@
       <main class="game-main">
         <header class="topbar">
           <div class="brand-word"><span>REPUBLIC</span><b>543</b></div>
-          <div class="top-slogan">STRATEGY BUILDS A BRIGHTER INDIA.</div>
+          <div class="top-slogan">Every decision has a consequence.</div>
           <div class="top-right">
             <div class="date-box"><small id="phase-label">PHASE: MOVEMENT</small><strong id="date-label">06 JUN 2026</strong></div>
             <div class="level-box"><div class="avatar-mini" id="avatar-mini">YOU</div><div><b id="top-player-name">PLAYER</b><span>LV <i id="player-level">1</i></span></div></div>
           </div>
         </header>
 
-        <div class="news-strip"><b>BREAKING NEWS</b><div id="ticker-text" class="ticker-text"></div><span id="clock-text">11:49</span></div>
+        <div class="news-strip"><b>Dispatch</b><div id="ticker-text" class="ticker-text"></div><span id="clock-text">11:49</span></div>
 
         <div id="page-content"></div>
       </main>
