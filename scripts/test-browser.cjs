@@ -356,6 +356,8 @@ assert.equal(vm.runInContext(`state.settings.confirm`,context),true,'old saves r
 assert.equal(vm.runInContext(`state.operationPlans.length+state.operationFollowups.length+state.donorFatigue`,context),0,'old saves receive safe empty interactive collections');
 vm.runInContext(`startHistoricalGame();state.date='2026-09-29';state.pendingScenes=[];`,context);
 assert.throws(()=>vm.runInContext(`completeHandoff('Bad <name>','Watch','civic')`,context),/valid name/,'handoff names cannot inject markup');
+vm.runInContext(`state.org.name='Legacy <markup>';ensureState();`,context);
+assert.equal(vm.runInContext('state.org.name',context),'Legacy markup','legacy saves cannot carry markup into templates');
 assert.ok(source.includes('cx="${cx}" cy="${cy}"'),'field-map markers write valid SVG coordinates directly');
 assert.ok(source.includes('custom-game-btn')&&source.includes('show("creator-screen")'),'the citizen creator is reachable from the intro');
 // Stale historical dispatches close themselves after three weeks instead of piling up.
