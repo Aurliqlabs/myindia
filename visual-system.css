@@ -273,3 +273,14 @@ button:active:not(:disabled){filter:brightness(.9)}
 .objective-stages b{display:grid;place-items:center;width:27px;height:27px;border:1px solid #7b807c;border-radius:var(--button-shape);color:#d8d5cb;font-size:11px}
 .objective-stages .complete{color:var(--gold)}.objective-stages .complete b{border-color:var(--gold);background:#514233;color:var(--gold)}
 @media(max-width:870px){.career-objective{align-items:stretch;flex-direction:column}.objective-stages{grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center;gap:4px;width:100%}}
+.civic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));gap:14px;margin-top:18px}
+.civic-file{padding:20px;background:#202425;border:1px solid #55544c;border-left:4px solid var(--red,#c9252a);min-width:0;color:#f2eee4}
+.civic-file h3{color:#f4eee2;font-size:clamp(19px,2vw,25px);line-height:1.15;margin:7px 0 12px}
+.civic-file p{line-height:1.5;color:#dad7cf;overflow-wrap:anywhere}
+.civic-file small{color:var(--gold,#e7bf72);font-weight:700}
+.civic-file a{color:#f0c46e;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.civic-file a:focus-visible{outline:2px solid #f0c46e;outline-offset:3px}
+.civic-request{border-top:1px solid #55544c;margin-top:17px;padding-top:14px}
+.civic-status{font-weight:700;color:#fff1d0!important}
+.civic-file .management-actions{display:flex;flex-wrap:wrap;gap:8px}
+.civic-file .management-actions button{white-space:normal;text-align:left}
