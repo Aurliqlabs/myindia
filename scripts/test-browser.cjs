@@ -109,6 +109,10 @@ const peopleRules=require('../src/shared/people-rules.js');
 let wellbeing={energy:8,stress:55,morale:70,employed:true};let leave;
 for(let day=14;day<21&&!leave;day++){const next=peopleRules.dailyWellbeing(wellbeing,`2026-05-${day}`,()=>.5);wellbeing={...wellbeing,...next};if(next.forcedLeave)leave=next.onLeaveUntil;}
 assert.ok(leave,'shared staff wellbeing must trigger leave after sustained exhaustion');
+vm.runInContext(`state.date='2026-10-01';state.phase='movement';state.org.staff=1;state.org.monthlyBurn=15000;state.org.funds=100000;state.advisers[0].energy=8;state.advisers[0].stress=55;state.advisers[0].morale=70;state.advisers[0].loyalty=70;state.advisers[0].burnoutStreak=0;state.advisers[0].onLeaveUntil=undefined;for(let i=0;i<7&&!state.advisers[0].onLeaveUntil;i++)advanceDay();`,context);
+state=vm.runInContext('state',context);
+assert.ok(state.advisers[0].onLeaveUntil,'browser adviser must take forced leave after sustained exhaustion');
+assert.ok(state.history.some(h=>h.title==='Adviser on leave'),'browser career history must record forced leave');
 console.log('Browser campaign, audit, timeline, election and staff checks passed.');
 
 
