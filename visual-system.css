@@ -262,3 +262,14 @@ button:active:not(:disabled){filter:brightness(.9)}
   background-size:100% 100%!important;
   color:#211b15;
 }
+
+/* Career direction uses real save-state milestones, without another dashboard card stack. */
+.career-objective{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:14px 18px;margin:0 0 16px;background:#262b2b;border:1px solid var(--line);border-left:4px solid var(--gold);color:var(--ink)}
+.objective-copy{min-width:0}.objective-copy>span{display:block;color:var(--gold);font-size:11px;font-weight:700;margin-bottom:3px}
+.objective-copy strong{display:block;font-size:clamp(17px,1.6vw,22px);line-height:1.15;color:var(--ink)}
+.objective-copy p{margin:5px 0 0;color:#d0cfc7;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.objective-stages{display:grid;grid-template-columns:repeat(4,max-content);gap:9px;flex:none}
+.objective-stages span{display:flex;flex-direction:column;align-items:center;gap:3px;color:#b9b8b0;font-size:10px;line-height:1.15}
+.objective-stages b{display:grid;place-items:center;width:27px;height:27px;border:1px solid #7b807c;border-radius:var(--button-shape);color:#d8d5cb;font-size:11px}
+.objective-stages .complete{color:var(--gold)}.objective-stages .complete b{border-color:var(--gold);background:#514233;color:var(--gold)}
+@media(max-width:870px){.career-objective{align-items:stretch;flex-direction:column}.objective-stages{grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center;gap:4px;width:100%}}

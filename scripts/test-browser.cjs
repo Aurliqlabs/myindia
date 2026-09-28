@@ -95,6 +95,11 @@ const blockedDay=state.day;
 vm.runInContext('waitForDispatch()',context);
 assert.equal(vm.runInContext('state.day',context),blockedDay,'waiting must not bypass an unanswered dispatch');
 assert.ok(saved['republic543-save'].includes('pendingScenes'),'waiting must persist the paused state');
-console.log('Browser campaign, audit and timeline checks passed.');
+vm.runInContext(`state.date='2026-10-01';state.day=141;state.phase='party';state.pendingScenes=[];state.pendingTip=null;state.flags.handoffResolved=true;state.elections=[];state.campaign={preparation:30,spend:0};state.org.funds=100000;state.org.credibility=0;state.org.volunteers=0;state.org.presence={};state.support=0;state.general=0;performAction('election');`,context);
+state=vm.runInContext('state',context);
+assert.equal(state.elections[0].seats,0,'low-support party must be able to lose all seats');
+assert.equal(state.phase,'party','zero seats must not unlock parliamentary opposition actions');
+assert.ok(vm.runInContext('careerObjectiveHTML()',context).includes('Rebuild after election night'),'a losing career needs a clear next objective');
+console.log('Browser campaign, audit, timeline and election checks passed.');
 
 
