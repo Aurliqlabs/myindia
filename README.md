@@ -38,7 +38,10 @@ The handoff screen opens by itself on 29 September. Choose one route:
 3. **Earn a national mandate to organise:** 300 volunteers, 60 credibility and 35% public support.
 4. **Commit to your route:** found the party (electoral), or three major civic cases and 500 volunteers (civic).
 
-After that, the map, investigations, elections and, if you win, government continue indefinitely.
+After that, each route has its own long game:
+
+- **Civic: national campaigns.** Pick a fictional reform, such as an examination integrity standard or minimum school facilities, and build momentum within 150 days through coalitions, legislator briefings, media and petitions. Published RTI records on the same topic strengthen every move. Momentum fades if you neglect it, and the deadline is fixed. Four reforms can be won.
+- **Electoral: the election calendar.** The Lok Sabha votes in spring 2029 and again in 2034. Between them, each state assembly votes on its own five-year cycle, starting with Uttar Pradesh, Punjab, Uttarakhand, Goa and Manipur in early 2027. Seat counts are real. Dates are projected from the last poll, and every result is simulated. State results build local presence for the general election; win a majority and you form that state's government.
 
 ### Your team
 

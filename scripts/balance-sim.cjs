@@ -60,12 +60,19 @@ function play(name,cfg,seed=7){
       if(!Object.values(s.org.presence).some(v=>v>=10)&&s.org.funds>=20000&&s.player.energy>=10){s.targetState='Maharashtra';if(run(`botTry(()=>performAction('state-visit'))`))continue;}
       const openIssue=run(`CIVIC_ISSUES.find(i=>!state.civicCases[i.id]?.outcome&&i.id!=='survivor')?.id`);
       if(openIssue&&run('majorCivicCases()')<3){const c=s.civicCases[openIssue]||{};if(run(`botTry(()=>{civicAction('${openIssue}','${c.verifiedOn?'publish':'verify'}');advanceDay();})`))continue;}
+      if(cfg.route==='civic'&&run('majorCivicCases()')>=3){
+        if(!run('activeCampaign()')&&s.org.funds>=50000){const next=run(`NATIONAL_CAMPAIGNS.find(d=>!state.nationalCampaigns.some(c=>c.id===d.id))?.id`);if(next&&run(`botTry(()=>campaignAction('launch','${next}'))`))continue;}
+        if(run('activeCampaign()')&&s.player.energy>=8){const move=['coalition','lobby','media'][s.day%3];if(run(`botTry(()=>campaignAction('${move}'))`))continue;}
+      }
       if(cfg.route==='civic'&&!s.rtiRequests.some(r=>['filed','appealed'].includes(r.status))&&s.org.funds>=1500){if(run(`botTry(()=>rtiAction('file',RTI_TOPICS[state.rtiRequests.length%RTI_TOPICS.length].id))`))continue;}
       if(cfg.route==='electoral'){
         if(s.phase==='movement'&&s.org.volunteers>=500&&s.org.credibility>=60&&s.org.funds>=250000&&s.support>=35){run(`performAction('found-party')`);mark('party');continue;}
         if(s.phase!=='movement'){
-          if(s.campaign.preparation>=30){if(s.org.funds>=50000){run(`performAction('election')`);mark('election');continue;}}
-          else if(s.org.funds>=25000&&s.player.energy>=8){if(run(`botTry(()=>performAction('campaign'))`))continue;}
+          const assembly=run(`ELECTIONS.find(e=>e.kind==='assembly'&&e.opens<=state.date&&state.date<=e.closes&&!state.contested[e.id]&&state.org.funds>=e.seats*1000)?.id`);
+          if(assembly&&s.player.energy>=10){if(run(`botTry(()=>contestAssembly('${assembly}'))`)){mark('firstAssembly');continue;}}
+          const general=run(`openElection('general')?.id`);
+          if(general&&!s.contested[general]&&s.campaign.preparation>=30&&s.org.funds>=50000){run(`performAction('election')`);mark('election-'+general);continue;}
+          if(s.campaign.preparation<60&&s.org.funds>=25000&&s.player.energy>=8){if(run(`botTry(()=>performAction('campaign'))`))continue;}
         }
       }
       if(s.org.volunteers<500&&s.org.funds>=3000&&s.day%2===0){if(run(`botTry(()=>performAction('recruit'))`))continue;}
@@ -77,7 +84,7 @@ function play(name,cfg,seed=7){
   }
   const final=snapshot(run);
   return {name,milestones,final,timeline,brokeMonths:run(`state.history.filter(h=>/shortfall/i.test(h.title)).length`),resignations:run(`state.history.filter(h=>h.title==='Resignation').length`),
-    elections:run('state.elections.map(e=>e.seats)'),jantarDone:run('Object.keys(state.jantarTasks).length'),negotiated:!!run('state.jantarCampaign.negotiation'),
+    elections:run('state.elections.map(e=>e.contest+":"+e.seats)'),assemblies:run('state.assemblyResults.map(r=>r.state+" "+r.seats+"/"+r.total)'),reforms:run('state.nationalCampaigns.map(c=>c.id+":"+(c.outcome||"active")+"@"+Math.round(c.progress)+" "+c.startedOn+"→"+(c.closedOn||""))'),jantarDone:run('Object.keys(state.jantarTasks).length'),negotiated:!!run('state.jantarCampaign.negotiation'),
     peakFunds:Math.max(...timeline.map(t=>t.funds),final.funds),lowEnergyDays:timeline.filter(t=>t.energy<20).length};
 }
 function snapshot(run){return run(`({date:state.date,funds:state.org.funds,volunteers:state.org.volunteers,credibility:state.org.credibility,support:state.support,energy:state.player.energy,stress:state.player.stress,health:state.player.health,job:state.player.jobStanding,money:state.player.money,staff:team().filter(x=>['paid','volunteer','on_leave'].includes(x.status)).length,payroll:GameEngine.api().payrollDue(state.world)})`);}
@@ -87,6 +94,8 @@ if(process.argv.includes('--json'))console.log(JSON.stringify(results,null,1));
 else for(const r of results){
   console.log(`\n=== ${r.name} ===`);
   console.log('milestones',JSON.stringify(r.milestones));
+  if(r.assemblies.length)console.log('assemblies',r.assemblies.join(' · '));
+  if(r.reforms.length)console.log('reforms',r.reforms.join(' · '));
   console.log('jantar tasks',r.jantarDone,'/13 · negotiated',r.negotiated,'· elections',JSON.stringify(r.elections),'· shortfall months',r.brokeMonths,'· resignations',r.resignations,'· peak funds',r.peakFunds);
   for(const t of r.timeline.filter((_,i)=>i%2===0))console.log(`  ${t.date} funds ${String(t.funds).padStart(8)} vol ${String(t.volunteers).padStart(4)} cred ${String(t.credibility).padStart(3)} sup ${String(t.support).padStart(3)} en ${String(t.energy).padStart(3)} hp ${t.health} job ${t.job} ₹own ${t.money} staff ${t.staff}`);
   console.log('  final',JSON.stringify(r.final));

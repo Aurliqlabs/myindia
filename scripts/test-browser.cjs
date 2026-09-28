@@ -53,7 +53,11 @@ assert.ok(saved['republic543-save'].includes('friend_asha'),'the saved tree incl
 vm.runInContext(`state.phase='party';state.org.funds=500000;state.org.volunteers=600;state.org.credibility=70;state.player.energy=80;state.support=40;state.general=20;state.targetState='Kerala';`,context);
 const before=JSON.stringify(vm.runInContext('simulateElection()',context));
 assert.equal(JSON.stringify(vm.runInContext('simulateElection()',context)),before,'same save must yield same election');
-vm.runInContext(`performAction('campaign');performAction('campaign');performAction('campaign');performAction('election');`,context);
+vm.runInContext(`performAction('campaign');performAction('election');`,context);
+assert.equal(vm.runInContext('state.elections.length',context),0,'no general election outside its window');
+vm.runInContext(`state.date='2029-04-02';performAction('campaign');performAction('campaign');performAction('election');`,context);
+assert.equal(vm.runInContext('state.elections[0].contest',context),'general-2029');
+assert.equal(vm.runInContext('state.contested["general-2029"]',context),'2029-04-04','the result is tied to its window');
 state=vm.runInContext('state',context);
 assert.equal(state.org.presence.Kerala,45);
 const result=state.elections[0];
@@ -128,7 +132,7 @@ const blockedDay=state.day;
 vm.runInContext('waitForDispatch()',context);
 assert.equal(vm.runInContext('state.day',context),blockedDay,'waiting must not bypass an unanswered dispatch');
 assert.ok(saved['republic543-save'].includes('pendingScenes'),'waiting must persist the paused state');
-vm.runInContext(`state.date='2026-10-01';state.day=141;state.phase='party';state.pendingScenes=[];state.pendingTip=null;state.flags.handoffResolved=true;state.elections=[];state.campaign={preparation:30,spend:0};state.org.funds=100000;state.org.credibility=0;state.org.volunteers=0;state.org.presence={};state.support=0;state.general=0;performAction('election');`,context);
+vm.runInContext(`state.date='2034-04-02';state.day=141;state.phase='party';state.pendingScenes=[];state.pendingTip=null;state.flags.handoffResolved=true;state.elections=[];state.campaign={preparation:30,spend:0};state.org.funds=100000;state.org.credibility=0;state.org.volunteers=0;state.org.presence={};state.support=0;state.general=0;performAction('election');`,context);
 state=vm.runInContext('state',context);
 assert.equal(state.elections[0].seats,0,'low-support party must be able to lose all seats');
 assert.equal(state.phase,'party','zero seats must not unlock parliamentary opposition actions');
@@ -251,4 +255,32 @@ vm.runInContext(`state.player.money=1000;state.player.jobStanding=0;state.player
 assert.equal(vm.runInContext('state.player.debt',context),21000,'unpaid living costs become personal debt');
 vm.runInContext(`state.player.jobStanding=100;state.player.monthlyIncome=35000;settlePersonalMonth();`,context);
 assert.equal(vm.runInContext('state.player.debt',context),8000,'salary pays debt down first');
-console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route and balance checks passed.');
+
+// Election calendar: five-year cycles, one contest per window, assembly results feed local presence.
+assert.equal(vm.runInContext('ELECTIONS.filter(e=>e.kind==="general").map(e=>e.opens).join()',context),'2029-04-01,2034-04-01');
+assert.equal(vm.runInContext('ELECTIONS.find(e=>e.id==="assembly-Uttar Pradesh-2027").seats',context),403);
+assert.equal(vm.runInContext('new Set(ELECTIONS.filter(e=>e.kind==="assembly"&&e.opens<"2032-01-01").map(e=>e.state)).size',context),31,'every assembly appears once per cycle');
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2027-02-10';state.pendingScenes=[];completeHandoff('Bot','Party','electoral');`,context);
+assert.throws(()=>vm.runInContext(`contestAssembly('assembly-Punjab-2027')`,context),/Found the party/);
+vm.runInContext(`state.phase='party';state.org.funds=500000;state.player.energy=80;state.org.presence.Punjab=40;state.support=30;contestAssembly('assembly-Punjab-2027');`,context);
+const punjab=vm.runInContext('state.assemblyResults[0]',context);
+assert.equal(punjab.total,117);
+assert.ok(vm.runInContext('state.org.presence.Punjab',context)>=42,'contesting builds local presence');
+assert.throws(()=>vm.runInContext(`contestAssembly('assembly-Punjab-2027')`,context),/Already contested/);
+assert.throws(()=>vm.runInContext(`contestAssembly('assembly-Gujarat-2027')`,context),/not open/);
+
+// Civic national campaigns: locked until three cases, fade when neglected, close on the deadline.
+vm.runInContext(`startHistoricalGame();state.flags.firstResponse='Organise';state.date='2026-10-01';state.pendingScenes=[];completeHandoff('Bot','Watch','civic');state.org.funds=400000;state.player.energy=90;`,context);
+assert.throws(()=>vm.runInContext(`campaignAction('launch','school-standards')`,context),/three major cases/);
+vm.runInContext(`for(const id of ['water','caste','heritage']){civicAction(id,'verify');civicAction(id,'publish');}campaignAction('launch','school-standards');`,context);
+assert.throws(()=>vm.runInContext(`campaignAction('launch','exam-integrity')`,context),/current campaign/);
+vm.runInContext(`campaignAction('coalition');`,context);
+const momentum=vm.runInContext('activeCampaign().progress',context);
+assert.ok(momentum>0,'a campaign move builds momentum');
+vm.runInContext(`for(let i=0;i<9;i++)advanceDay();`,context);
+assert.ok(vm.runInContext('activeCampaign().progress',context)<momentum,'neglected campaigns lose momentum');
+vm.runInContext(`activeCampaign().progress=99;state.player.energy=90;campaignAction('lobby');`,context);
+assert.equal(vm.runInContext('state.nationalCampaigns[0].outcome',context),'adopted');
+vm.runInContext(`campaignAction('launch','water-disclosure');const c=activeCampaign();while(state.date<c.deadline)advanceDay();`,context);
+assert.equal(vm.runInContext('state.nationalCampaigns[0].outcome',context),'stalled','the deadline closes an unfinished campaign');
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar and campaign checks passed.');

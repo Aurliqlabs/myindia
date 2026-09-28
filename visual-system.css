@@ -321,3 +321,6 @@ button:active:not(:disabled){filter:brightness(.9)}
 .route-card:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
 .route-title{font-size:18px;font-weight:750;color:var(--ink)}.route-lede{font-size:13px;color:#d0cec6}
 .route-card ul{margin:2px 0 0;padding-left:18px;font-size:13px;color:var(--ink)}.route-card small{color:var(--gold)}
+.campaign-card{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding:16px;background:#292d2f;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:4px}
+.campaign-card>small{color:var(--gold);font-size:11px;font-weight:650;letter-spacing:.02em}
+.campaign-card>strong{font-size:20px;color:var(--ink)}.campaign-card>p{margin:0}
