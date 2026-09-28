@@ -1,6 +1,6 @@
 import { clamp } from "./math";
 import { CandidateImpression, CandidateProfile, CharacterPsychology, CharacterState, StaffSkillKey, WorldState } from "./types";
-import { makeId } from "./id";
+import { makeWorldId } from "./id";
 import { hireCharacter } from "./characters";
 import { Rng } from "./rng";
 
@@ -27,7 +27,7 @@ export function generateCandidate(world:WorldState,rng:Rng):CandidateProfile {
     fear:clamp(rng.integer(10,70)),ego:clamp(rng.integer(15,90)),riskTolerance:clamp(rng.integer(15,90)),ideologicalCommitment:clamp(rng.integer(20,90))
   };
   return {
-    id:makeId("candidate",world.seed),name,age:22+rng.integer(0,28),homeState:rng.pick(HOME_STATES),background:rng.pick(BACKGROUNDS),
+    id:makeWorldId(world,"candidate"),name,age:22+rng.integer(0,28),homeState:rng.pick(HOME_STATES),background:rng.pick(BACKGROUNDS),
     trueSkills,truePsychology,interviewLevel:0,generatedOn:world.date
   };
 }
@@ -69,7 +69,7 @@ export function assessCandidate(candidate:CandidateProfile,rng:Rng):CandidateImp
 
 export function hireCandidate(world:WorldState,candidateId:string,role:string,salaryMonthly:number,volunteer=false):CharacterState {
   const candidate=world.recruitmentPool.find(c=>c.id===candidateId); if(!candidate)throw new Error("Unknown candidate");
-  const id=makeId("staff",world.seed);
+  const id=makeWorldId(world,"staff");
   world.characters[id]={
     id,name:candidate.name,age:candidate.age,role,homeState:candidate.homeState,background:candidate.background,
     salaryMonthly:0,skills:candidate.trueSkills,energy:80,health:90,stress:20,morale:70,

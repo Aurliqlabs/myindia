@@ -73,7 +73,7 @@ export interface ElectionResult { constituencyId:Id; turnout:number; votes:Recor
 export interface ScheduledEvent { id:Id; date:string; kind:string; payload:Record<string,unknown>; }
 
 export interface WorldState {
-  schemaVersion:number; seed:number; rngState:number; date:string; realWorldSnapshotDate:string; day:number; phase:Phase;
+  schemaVersion:number; seed:number; idCounter?:number; rngState:number; date:string; realWorldSnapshotDate:string; day:number; phase:Phase;
   player:PlayerProfile; organisation:OrganisationState; characters:Record<Id,CharacterState>; relationships:RelationshipState[];
   memories:CharacterMemory[]; operations:Record<Id,OperationState>; evidence:Record<Id,EvidenceNode>; evidenceEdges:EvidenceEdge[];
   secrets:Record<Id,SecretState>; publicOpinion:PublicOpinionState; macro:MacroState; parties:Record<Id,PartyState>;

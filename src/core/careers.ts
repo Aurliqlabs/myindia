@@ -3,11 +3,11 @@ import { CareerEvent, CharacterState, OrgRole, StaffSkillKey, WorldState } from 
 import { adjustRelationship, getRelationship, remember } from "./relationships";
 import { assignRole } from "./characters";
 import { nextRoleUp, roleLevel, ROLE_PROFILES } from "./roles";
-import { makeId } from "./id";
+import { makeWorldId } from "./id";
 import { Rng } from "./rng";
 
 function logCareerEvent(world:WorldState,characterId:string,type:CareerEvent["type"],note:string):void {
-  world.characterEvents.push({id:makeId("career",world.seed),characterId,date:world.date,type,note});
+  world.characterEvents.push({id:makeWorldId(world,"career"),characterId,date:world.date,type,note});
   if(world.characterEvents.length>3000)world.characterEvents.splice(0,world.characterEvents.length-3000);
 }
 

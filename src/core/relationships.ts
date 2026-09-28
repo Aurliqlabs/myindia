@@ -1,6 +1,6 @@
 import { clamp } from "./math";
 import { CharacterMemory, MemoryType, RelationshipState, WorldState } from "./types";
-import { makeId } from "./id";
+import { makeWorldId } from "./id";
 import { defaultDecay } from "./memory";
 export function getRelationship(world:WorldState,a:string,b:string):RelationshipState|undefined {
   return world.relationships.find(r=>(r.actorA===a&&r.actorB===b)||(r.actorA===b&&r.actorB===a));
@@ -12,7 +12,7 @@ export function adjustRelationship(world:WorldState,a:string,b:string,delta:Part
 }
 export interface MemoryExtra { involvedIds?:string[]; emotionalValence?:number; decay?:number; politicalRelevance?:number; }
 export function remember(world:WorldState,characterId:string,type:MemoryType,salience:number,note:string,extra:MemoryExtra={}):CharacterMemory {
-  const memory:CharacterMemory={id:makeId("mem",world.seed),characterId,date:world.date,type,salience:clamp(salience),note,
+  const memory:CharacterMemory={id:makeWorldId(world,"mem"),characterId,date:world.date,type,salience:clamp(salience),note,
     involvedIds:extra.involvedIds,emotionalValence:extra.emotionalValence,decay:extra.decay??defaultDecay(clamp(salience)),politicalRelevance:extra.politicalRelevance};
   world.memories.push(memory); if(world.memories.length>5000)world.memories.splice(0,world.memories.length-5000); return memory;
 }

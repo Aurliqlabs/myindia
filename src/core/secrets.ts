@@ -1,11 +1,11 @@
 import { clamp } from "./math";
 import { EvidenceKind, SecretKind, SecretState, WorldState } from "./types";
-import { makeId } from "./id";
+import { makeWorldId } from "./id";
 export function createEvidence(world:WorldState,caseId:string,kind:EvidenceKind,label:string,confidence=.75):string {
-  const id=makeId("evidence",world.seed);world.evidence[id]={id,caseId,kind,label,confidence:clamp(confidence,0,1),visibility:"private"};return id;
+  const id=makeWorldId(world,"evidence");world.evidence[id]={id,caseId,kind,label,confidence:clamp(confidence,0,1),visibility:"private"};return id;
 }
 export function createSecret(world:WorldState,input:{kind:SecretKind;severity:number;witnessIds?:string[];evidence?:Array<{kind:EvidenceKind;label:string;confidence?:number}>}):SecretState {
-  const id=makeId("secret",world.seed),caseId=`case_${id}`;const evidenceIds=(input.evidence??[]).map(e=>createEvidence(world,caseId,e.kind,e.label,e.confidence));
+  const id=makeWorldId(world,"secret"),caseId=`case_${id}`;const evidenceIds=(input.evidence??[]).map(e=>createEvidence(world,caseId,e.kind,e.label,e.confidence));
   const s:SecretState={id,kind:input.kind,createdOn:world.date,severity:clamp(input.severity),exposureRisk:clamp(2+input.severity*.12),legalRisk:clamp(input.severity*.75),politicalRisk:clamp(input.severity*.85),witnessIds:input.witnessIds??[],evidenceIds,exposed:false};world.secrets[id]=s;return s;
 }
 export function tickSecretExposure(world:WorldState,secret:SecretState,rng:{next():number}):{exposed:boolean;roll:number;threshold:number} {

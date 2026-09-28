@@ -86,6 +86,18 @@ while(genericAnchor.date<='2026-07-25')core.advanceOneDay(genericAnchor);
 ok(genericAnchor.flags.reported_ministerial_resignation===true,'ordinary time advance must install reported July anchor');
 ok(genericAnchor.completedEventIds.filter(id=>id==='cjp_2026_07_25_minister_resignation').length===1,'historical anchors fire once');
 ok(campaign.campaign2026(genericAnchor).historicalOutcomeRecorded,'campaign view must hydrate the fixed anchor');
+const identityA=core.createNewGame({name:'Identity',age:28,homeState:'Delhi',profession:'Analyst',trait:'analyst',seed:991});
+const identityB=core.createNewGame({name:'Identity',age:28,homeState:'Delhi',profession:'Analyst',trait:'analyst',seed:991});
+const firstEvidence=core.createEvidence(identityA,'case-a','document','First sheet');
+const secondWorldEvidence=core.createEvidence(identityB,'case-b','document','Other world sheet');
+ok(firstEvidence===secondWorldEvidence,'independent worlds must allocate deterministically');
+const candidate=core.generateCandidate(identityA,createRng(5));
+identityA.recruitmentPool.push(candidate);
+const savedIdentity=JSON.parse(core.serializeWorld(identityA));delete savedIdentity.idCounter;
+const loadedIdentity=core.deserializeWorld(JSON.stringify(savedIdentity));
+const nextEvidence=core.createEvidence(loadedIdentity,'case-a','witness','After reload');
+ok(firstEvidence!==nextEvidence&&nextEvidence!==candidate.id&&Object.keys(loadedIdentity.evidence).length===2,'old saves must never reuse an entity ID');
+ok(loadedIdentity.idCounter>identityA.idCounter,'save must recover the next world ID');
 console.log('REPUBLIC: 543 core smoke tests passed');
 
 

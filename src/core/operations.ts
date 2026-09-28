@@ -1,14 +1,14 @@
 import { clamp, mean } from "./math";
 import { effectiveSkill, workCharacter } from "./characters";
 import { OperationKind, OperationState, WorldState } from "./types";
-import { makeId } from "./id";
+import { makeWorldId } from "./id";
 import { spendOrganisation } from "./finance";
 const primarySkill:Record<OperationKind,"field"|"research"|"legal"|"media"|"fundraising"|"leadership">={
  protest:"field",school_audit:"research",public_investigation:"research",state_visit:"leadership",press_conference:"media",fundraising:"fundraising",recruitment:"leadership",legal_challenge:"legal",social_campaign:"media"
 };
 export function startOperation(world:WorldState,input:Omit<OperationState,"id"|"startedOn"|"progress"|"spent"|"status">):OperationState {
   if(input.budgetAllocated>world.organisation.finance.organisationCash)throw new Error("Insufficient organisation funds");
-  const op:OperationState={...input,id:makeId("op",world.seed),startedOn:world.date,progress:0,spent:0,status:"active"};world.operations[op.id]=op;return op;
+  const op:OperationState={...input,id:makeWorldId(world,"op"),startedOn:world.date,progress:0,spent:0,status:"active"};world.operations[op.id]=op;return op;
 }
 export function tickOperation(world:WorldState,op:OperationState,rng:{next():number}):number {
   if(op.status!=="active")return 0;const staff=op.staffIds.map(id=>world.characters[id]).filter(Boolean);const skill=primarySkill[op.kind];
