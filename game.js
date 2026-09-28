@@ -130,7 +130,8 @@ const ACTIONS={
  meet:p=>openCandidate(p.id),
  set:p=>setAction(p.key,p.value),
  act:p=>performAction(p.act,p.arg),
- project:p=>startPlannedProject(p.id,p.approach),
+ project:p=>launchPlannedOperation(p.id,p.approach),
+ reviewOp:p=>openOperationReview(p.id),
  planProject:p=>openOperationPlanner(p.id),
  studio:p=>openMediaStudio(p.kind),
  mediaRoom:p=>openMediaActionRoom(p.kind),
@@ -534,7 +535,7 @@ const ROUTINE_DAYS={fundraise:[[],[1],[1,4],[0,2,4]],rest:[[],[6],[3,6]],tours:[
 function weakestState(){return Object.entries(SEAT_COUNTS).sort((a,b)=>(state.org.presence[a[0]]||0)/a[1]-(state.org.presence[b[0]]||0)/b[1]||b[1]-a[1])[0][0];}
 function electionReserveNeeded(){const e=openElection("general")||nextElection("general");return !!e&&!state.contested[e.id]&&e.opens<=addDays(state.date,60);}
 function routineHTML(){if(!state.flags.firstResponse)return "";const r=state.routine;return `<div class="routine"><strong>Your weekly routine</strong><div class="routine-controls">${segmented("routine.fundraise","Donor drives a week",[0,1,2,3])}${segmented("routine.rest","Rest days a week",[0,1,2])}${state.phase!=="movement"?segmented("routine.tours","Campaign tours a week",[0,1,2]):""}</div><small>${state.phase!=="movement"&&r.tours?"Tours go to the state where the party is weakest for its size, and pause when money is needed for a general election. ":""}Other days go to movement work. You rest automatically when exhausted. Anything that needs you stops the clock.</small><div class="management-actions"><button data-act="advance-week" ${routineBlocked()?"disabled":""}>Advance a week</button><button data-act="advance-month" ${routineBlocked()?"disabled":""}>Advance a month</button></div></div>`;}
-function routineBlocked(){return !state.flags.firstResponse||state.pendingScenes.length>0||!!state.pendingCrisis||state.historicalRoleplay&&state.date>timelineCutoff()&&!state.handoff||!!(state.ending&&!state.ending.dismissed);}
+function routineBlocked(){return !state.flags.firstResponse||state.pendingScenes.length>0||!!state.pendingCrisis||state.operationFollowups?.some(x=>x.dueDay<=state.day)||state.historicalRoleplay&&state.date>timelineCutoff()&&!state.handoff||!!(state.ending&&!state.ending.dismissed);}
 /** Runs the routine day by day and stops the moment something needs the player. */
 function advanceWithRoutine(days){ensureState();if(routineBlocked())return toast("Something needs your attention first.");
  const start=state.date,raisedBefore=state.donations.reduce((a,d)=>a+d.amount,0),generalOpen=!!openElection("general");let passed=0,rested=0,drives=0,tours=0,reason="";
@@ -550,7 +551,8 @@ function advanceWithRoutine(days){ensureState();if(routineBlocked())return toast
   if(state.historicalRoleplay&&state.date>timelineCutoff()&&!state.handoff){reason="History has reached the handoff.";break;}
   if(state.ending&&!state.ending.dismissed){reason="The story has reached an ending.";break;}
   if(!generalOpen&&openElection("general")){reason="The general election is open.";break;}
-  if(state.pendingTip?.offeredOn===state.date){reason="An anonymous tip arrived.";break;}}
+  if(state.pendingTip?.offeredOn===state.date){reason="An anonymous tip arrived.";break;}
+  if(state.operationFollowups?.some(x=>x.dueDay<=state.day)){reason="An operation report is ready for your review.";break;}}
  const raised=state.donations.reduce((a,d)=>a+d.amount,0)-raisedBefore;
  record("Routine",`${start} to ${state.date}: ${drives} donor drive${drives===1?"":"s"} raised ₹${money(raised)}, ${rested} rest day${rested===1?"":"s"}${tours?`, ${tours} campaign tour${tours===1?"":"s"}`:""}.${reason?" Stopped: "+reason:""}`);
  save();renderGame();if(typeof showCampaignClock==="function")showCampaignClock({start,end:state.date,passed,drives,rested,tours,raised,reason,headlines:state.history.slice(0,5)});toast(reason||`${passed} days passed.`);}
@@ -598,6 +600,7 @@ settlePersonalMonth();const due=state.org.monthlyBurn,paid=Math.min(due,state.or
  act3Daily();
  save();renderGame();}
 function updateDate(){const d=new Date(state.date+"T00:00:00Z");$("#date-label").textContent=new Intl.DateTimeFormat("en-GB",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(d).toUpperCase();const latest=state.history&&state.history[0];const breaking=latest&&latest.date===state.date&&/Expos|audit|Historical/.test(latest.title);$("#ticker-text").textContent=latest?`${latest.title.toUpperCase()} · ${latest.detail}`:`Day ${state.day}.`;}
+function launchPlannedOperation(id,approach){const project=PROJECTS.find(x=>x.id===id),started=state.day;if(!project)return;startPlannedProject(id,approach);const launched=state.projects[0]?.id===id?state.projects[0]:null;if(launched){state.operationFollowups??=[];if(!state.operationFollowups.some(x=>x.projectId===id&&x.started===started))state.operationFollowups.unshift({id:`review-${started}-${id}`,projectId:id,name:project.name,started,dueDay:started+project.days,approach:launched.approach});}}
 function startPlannedProject(id,approach="listen"){ensureState();const project=PROJECTS.find(x=>x.id===id);if(!project)return;if(state.org.funds<project.cost)return toast("The movement cannot afford this operation.");if(state.player.energy<project.energy)return toast("Your energy is too low. Rest before starting.");const plans={listen:{label:"Listen first",effect:{credibility:1}},deliver:{label:"Deliver visibly",effect:{support:1}},build:{label:"Build local capacity",effect:{volunteers:8}}},plan=plans[approach]||plans.listen,effect={...project.effect};for(const [key,value] of Object.entries(plan.effect))effect[key]=(effect[key]||0)+value;applyEffect({funds:-project.cost,energy:-project.energy});state.projects.unshift({id:project.id,name:project.name,date:state.date,cost:project.cost,status:"active",remaining:project.days,effect,approach:plan.label});record("Operation launched",`${project.name} began with the ${plan.label.toLowerCase()} plan.`);advanceDay();toast(`${project.name} launched. The plan will shape the completed report.`);}
 function fmtNum(n){n=Math.round(n||0);return n>=1000000?(n/1000000).toFixed(1)+"M":n>=1000?(n/1000).toFixed(1)+"K":String(n);}
 function money(n){return n>=10000000?(n/10000000).toFixed(2)+" Cr":n>=100000?(n/100000).toFixed(1)+" L":n.toLocaleString("en-IN")}
@@ -610,5 +613,6 @@ WIRING.push(["[data-project]",b=>["planProject",{id:b.dataset.project}]]);
 WIRING.push(["[data-act^='reel-']",b=>["studio",{kind:b.dataset.act}]]);
 WIRING.push(["[data-act='interview']",()=>["studio",{kind:"interview"}]]);
 WIRING.push(["[data-act='briefing'],[data-act='meme'],[data-act='thread'],[data-act='livestream'],[data-act='crisis-pr'],[data-act='pr-retainer']",b=>["mediaRoom",{kind:b.dataset.act}]]);
+WIRING.push([["[data-review-operation]"].join(""),b=>["reviewOp",{id:b.dataset.reviewOperation}]]);
 if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"&&document.body){new MutationObserver(()=>{document.querySelectorAll(".panel-title h3:not([data-toned]),.decision-box h2:not([data-toned])").forEach(twoTone);}).observe(document.body,{childList:true,subtree:true});}
 init();
