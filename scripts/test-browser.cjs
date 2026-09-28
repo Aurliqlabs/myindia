@@ -331,4 +331,17 @@ assert.ok(vm.runInContext('state.day-stop<=28',context));
 assert.ok(vm.runInContext('state.lastCaseOn===state.date||state.day-stop===28',context),'a new case stops the routine on the day it arrives');
 vm.runInContext(`state.pendingScenes=['exam-remark'];`,context);
 assert.ok(vm.runInContext('routineBlocked()',context),'the routine waits while a dispatch is unanswered');
-console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar, campaign, Act 3 and routine checks passed.');
+
+// Asking before acting: world-changing clicks ask; navigation, pickers and story buttons do not; players can opt out.
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
+assert.equal(vm.runInContext(`needsConfirmation('people',{action:'release'})`,context),true);
+assert.equal(vm.runInContext(`needsConfirmation('go',{page:'home'})||needsConfirmation('pick',{})||needsConfirmation('act',{act:'advance-week'})||needsConfirmation('talk',{})`,context),false);
+vm.runInContext(`state.settings={confirm:false};`,context);
+assert.equal(vm.runInContext(`needsConfirmation('act',{act:'found-party'})`,context),false,'the setting turns confirmations off');
+vm.runInContext(`state.settings={};`,context);
+// Stale historical dispatches close themselves after three weeks instead of piling up.
+vm.runInContext(`state.date='2026-09-01';state.pendingScenes=['cjp-pressure-group','cjp-eci-demand'];expireStaleScenes();`,context);
+assert.equal(vm.runInContext('state.pendingScenes.join()',context),'cjp-eci-demand','only dispatches older than 21 days expire');
+assert.ok(vm.runInContext('state.sceneResponses["cjp-pressure-group"].includes("moment passed")',context));
+assert.ok(vm.runInContext('metric("Paid staff",5)',context).includes('<b>5</b> paid staff'),'figures read as facts, not tiles');
+console.log('Browser campaign, audit, timeline, election, staff, engine store, handoff, route, balance, calendar, campaign, Act 3, routine and interface checks passed.');
