@@ -349,6 +349,10 @@ vm.runInContext(`state={date:'2026-10-07',day:7,phase:'movement',player:{name:'T
 assert.equal(vm.runInContext('state.org.members',context),18,'weekly growth converts a bounded share of volunteers into members');
 assert.equal(vm.runInContext('organisationGrowth().chapters',context),3,'sustained local presence becomes chapters');
 assert.ok(vm.runInContext('state.history.some(x=>x.title==="Organisation milestone")',context),'growth stages generate a gameplay milestone');
+vm.runInContext(`state={date:'2026-10-07',day:7,phase:'movement',player:{name:'Test',energy:70,stress:10},org:{name:'Watch',funds:50000,credibility:70,media:0,legal:0,volunteers:300,members:35,presence:{Kerala:15}},support:20,flags:{firstResponse:'Organise'}};ensureState();runChapterAction('Kerala','listen');`,context);
+assert.equal(vm.runInContext('state.org.presence.Kerala',context),19,'chapter support deepens sustained local presence');
+assert.equal(vm.runInContext('state.org.members',context),37,'chapter work converts support into committed membership');
+assert.ok(vm.runInContext('!!dueFieldIncident()',context),'chapter work creates a field consequence');
 
 // Asking before acting: world-changing clicks always ask; navigation, pickers and story buttons do not.
 assert.equal(vm.runInContext(`needsConfirmation('act',{act:'hidden-donation'})`,context),true);
